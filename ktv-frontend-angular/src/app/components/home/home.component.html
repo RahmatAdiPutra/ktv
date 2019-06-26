@@ -1,0 +1,7 @@
+<div class="vh-100 bg-secondary">
+  <ul class="nav" *ngFor="let menu of options">
+    <li class="nav-item" *ngIf="menu.allow">
+      <a class="nav-link text-light" href="{{menu.url}}">{{menu.name}}</a>
+    </li>
+  </ul>
+</div>

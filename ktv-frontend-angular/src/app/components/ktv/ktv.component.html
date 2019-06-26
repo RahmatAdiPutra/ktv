@@ -1,0 +1,49 @@
+<div class="vh-100 d-flex flex-column">
+  <div class="d-flex flex-row">
+    <div class="w-25 d-flex justify-content-center bg-secondary">
+      <h1>KTV 1001</h1>
+    </div>
+
+    <div class="w-75 d-flex justify-content-between align-items-center bg-white">
+      <div class="p-2">
+        <mat-form-field>
+          <input matInput type="search" placeholder="Search">
+          <button mat-button matSuffix mat-icon-button aria-label="Search" disabled>
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div class="p-2">
+        <div class="d-flex flex-row" *ngIf="true">
+            <div class="p-2"><button mat-raised-button>Register</button></div>
+            <div class="p-2"><button mat-raised-button>Login</button></div>
+        </div>
+        <div class="d-flex flex-row" *ngIf="false">
+            <div class="p-2"><button mat-raised-button>Setting</button></div>
+            <div class="p-2"><button mat-raised-button>Profile</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="h-100 d-flex flex-row">
+    <div class="w-25 bg-secondary p-2">
+      <ul class="nav" *ngFor="let menu of options">
+        <li class="nav-item" *ngIf="menu.allow">
+          <a class="nav-link text-light" href="{{menu.url}}">{{menu.name}}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="w-75 bg-white">
+      <div class="p-2">Content</div>
+      <div class="p-2">Content</div>
+      <div class="p-2">Content</div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center bg-light">
+    <div>Player</div>
+  </div>
+</div>
