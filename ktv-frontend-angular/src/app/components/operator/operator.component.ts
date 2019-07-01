@@ -107,17 +107,19 @@ export class OperatorComponent implements OnInit {
     {name: 'Mandarin'}
   ];
 
+  DATA_PLAYLIST = [];
+
   songColumns: string[] = ['select', 'title', 'artist', 'genre', 'language'];
   playlistColumns: string[] = ['select', 'title', 'artist'];
   roomColumns: string[] = ['name', 'status', 'ip_address'];
   roomCallColumns: string[] = ['name', 'guest', 'action'];
 
-  songSource = new MatTableDataSource<Songs>(DATA_SONG);
-  playlistSource = DATA_SONG;
+  songSource = new MatTableDataSource(DATA_SONG);
+  playlistSource = this.DATA_PLAYLIST;
   roomSource = DATA_ROOM;
   roomCallSource = DATA_ROOM_CALL;
   
-  selection = new SelectionModel<Songs>(true, []);
+  selection = new SelectionModel(true, []);
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild(MatSort) songSort: MatSort;
@@ -137,6 +139,7 @@ export class OperatorComponent implements OnInit {
   }
 
   masterToggle() {
+    console.log(this.isAllSelected());
     this.isAllSelected() ?
         this.selection.clear() :
         this.songSource.data.forEach(row => this.selection.select(row));
@@ -146,7 +149,17 @@ export class OperatorComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
     }
+    // console.log(row);
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.title + 1}`;
+  }
+
+  tes(data) {
+    this.DATA_PLAYLIST.push(data);
+  }
+
+  addToPlaylist() {
+    this.playlistSource = this.DATA_PLAYLIST;
+    console.log(this.playlistSource);
   }
 
 }

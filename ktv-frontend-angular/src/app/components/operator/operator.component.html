@@ -52,9 +52,9 @@
 
             <!-- Action Column -->
             <ng-container matColumnDef="action">
-              <th mat-header-cell *matHeaderCellDef> Calling </th>
+              <th mat-header-cell *matHeaderCellDef> Incoming Call </th>
               <td mat-cell *matCellDef="let element">
-                <button mat-raised-button color="primary">
+                <button mat-icon-button color="primary">
                   <mat-icon>phone_callback</mat-icon>
                 </button>
               </td>
@@ -119,7 +119,7 @@
       <!-- SONG BANK -->
       <div class="h-75 m-1 bg-light">
         <div class="d-flex flex-column h-100">
-          <div class="overflow-auto">
+          <div class="overflow-auto flex-grow-1 vh-100">
             <table mat-table [dataSource]="songSource" matSort class="mat-elevation-z8 w-100">
               <!-- Checkbox Column -->
               <ng-container matColumnDef="select">
@@ -161,10 +161,10 @@
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="songColumns; sticky: true"></tr>
-              <tr mat-row *matRowDef="let row; columns: songColumns;" (click)="selection.toggle(row)"></tr>
+              <tr mat-row *matRowDef="let row; columns: songColumns;" (click)="[selection.toggle(row), tes(row)]"></tr>
             </table>
           </div>
-          <div class="">
+          <div class="bg-white">
             <mat-paginator [pageSizeOptions]="[20, 15, 10, 5]" showFirstLastButtons></mat-paginator>
           </div>
         </div>
@@ -176,7 +176,7 @@
     <!-- BUTTON -->
     <div class="d-flex flex-column align-self-center">
       <div class="p-1">
-        <button mat-mini-fab color="primary">
+        <button mat-mini-fab color="primary" (click)="addToPlaylist()">
           <mat-icon>keyboard_arrow_right</mat-icon>
         </button>
       </div>
@@ -214,13 +214,13 @@
       <div class="h-40 m-1 bg-light">
         <mat-tab-group>
           <mat-tab label="Priview Video">
-            <div class="d-flex flex-column">
-              <div class="d-flex flex-row">
+            <div class="d-flex flex-column h-100">
+              <div class="d-flex flex-row flex-grow-1 vh-100">
                 <video class="h-100 w-100" controls>
                   <source src="http://localhost/videos/nirvana.mp4" type="video/mp4">
                 </video>
               </div>
-              <div class="d-flex flex-row align-self-center">
+              <div class="d-flex flex-row justify-content-center w-100 bg-white">
                 <div class="">
                   <button mat-icon-button>
                     <mat-icon>play_circle_filled</mat-icon>
@@ -260,7 +260,7 @@
         <mat-tab-group>
           <mat-tab label="Playlist NameRoom">
             <div class="d-flex flex-column h-100">
-              <div class="overflow-auto">
+              <div class="overflow-auto flex-grow-1 vh-100">
                 <table mat-table [dataSource]="playlistSource" class="mat-elevation-z8 w-100">
                   <!-- Checkbox Column -->
                   <ng-container matColumnDef="select">
@@ -293,7 +293,7 @@
                   <tr mat-row *matRowDef="let row; columns: playlistColumns;" (click)="selection.toggle(row)"></tr>
                 </table>
               </div>
-              <div class="d-flex flex-row align-self-center">
+              <div class="d-flex flex-row justify-content-center w-100 bg-white">
                 <div class="p-1">
                   <button mat-mini-fab>
                     <mat-icon>play_circle_filled</mat-icon>
