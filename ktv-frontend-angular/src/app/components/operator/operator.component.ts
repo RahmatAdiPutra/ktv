@@ -14,6 +14,12 @@ export interface Songs {
 export interface Rooms {
   name: string;
   status: string;
+  ip_address: string;
+}
+
+export interface RoomCalling {
+  name: string;
+  guest: string;
 }
 
 const DATA_SONG: Songs[] = [
@@ -46,26 +52,43 @@ const DATA_SONG: Songs[] = [
 ];
 
 const DATA_ROOM: Rooms[] = [
-  {name:'ktv01', status:'available'},
-  {name:'ktv02', status:'available'},
-  {name:'ktv03', status:'available'},
-  {name:'ktv04', status:'available'},
-  {name:'ktv05', status:'available'},
-  {name:'ktv06', status:'available'},
-  {name:'ktv07', status:'available'},
-  {name:'ktv08', status:'available'},
-  {name:'ktv09', status:'available'},
-  {name:'ktv10', status:'available'},
-  {name:'ktv11', status:'available'},
-  {name:'ktv12', status:'available'},
-  {name:'ktv13', status:'available'},
-  {name:'ktv14', status:'available'},
-  {name:'ktv15', status:'available'},
-  {name:'ktv16', status:'available'},
-  {name:'ktv17', status:'available'},
-  {name:'ktv18', status:'available'},
-  {name:'ktv19', status:'available'},
-  {name:'ktv20', status:'available'},
+  {name:'ktv01', status:'available', ip_address:'192.168.0.1'},
+  {name:'ktv02', status:'available', ip_address:'192.168.0.2'},
+  {name:'ktv03', status:'available', ip_address:'192.168.0.3'},
+  {name:'ktv04', status:'available', ip_address:'192.168.0.4'},
+  {name:'ktv05', status:'available', ip_address:'192.168.0.5'},
+  {name:'ktv06', status:'available', ip_address:'192.168.0.6'},
+  {name:'ktv07', status:'available', ip_address:'192.168.0.7'},
+  {name:'ktv08', status:'available', ip_address:'192.168.0.8'},
+  {name:'ktv09', status:'available', ip_address:'192.168.0.9'},
+  {name:'ktv10', status:'available', ip_address:'192.168.0.10'},
+  {name:'ktv11', status:'available', ip_address:'192.168.0.11'},
+  {name:'ktv12', status:'available', ip_address:'192.168.0.12'},
+  {name:'ktv13', status:'available', ip_address:'192.168.0.13'},
+  {name:'ktv14', status:'available', ip_address:'192.168.0.14'},
+  {name:'ktv15', status:'available', ip_address:'192.168.0.15'},
+  {name:'ktv16', status:'available', ip_address:'192.168.0.16'},
+  {name:'ktv17', status:'available', ip_address:'192.168.0.17'},
+  {name:'ktv18', status:'available', ip_address:'192.168.0.18'},
+  {name:'ktv19', status:'available', ip_address:'192.168.0.19'},
+  {name:'ktv20', status:'available', ip_address:'192.168.0.20'},
+  {name:'ktv21', status:'available', ip_address:'192.168.0.21'},
+  {name:'ktv22', status:'available', ip_address:'192.168.0.22'},
+  {name:'ktv23', status:'available', ip_address:'192.168.0.23'},
+  {name:'ktv24', status:'available', ip_address:'192.168.0.24'},
+  {name:'ktv25', status:'available', ip_address:'192.168.0.25'},
+];
+
+const DATA_ROOM_CALL: RoomCalling[] = [
+  {name:'ktv01', guest:'joko'},
+  {name:'ktv02', guest:'jaka'},
+  {name:'ktv03', guest:'jarwo'},
+  {name:'ktv04', guest:'budi'},
+  {name:'ktv05', guest:'badi'},
+  {name:'ktv06', guest:'baki'},
+  {name:'ktv07', guest:'bagus'},
+  {name:'ktv08', guest:'jasmi'},
+  {name:'ktv09', guest:'john'},
 ];
 
 @Component({
@@ -73,6 +96,7 @@ const DATA_ROOM: Rooms[] = [
   templateUrl: './operator.component.html',
   styleUrls: ['./operator.component.css']
 })
+
 export class OperatorComponent implements OnInit {
 
   options = [
@@ -84,22 +108,19 @@ export class OperatorComponent implements OnInit {
   ];
 
   songColumns: string[] = ['select', 'title', 'artist', 'genre', 'language'];
-  playlistColumns: string[] = ['select', 'no', 'title', 'artist'];
-  roomColumns: string[] = ['no', 'name', 'status'];
+  playlistColumns: string[] = ['select', 'title', 'artist'];
+  roomColumns: string[] = ['name', 'status', 'ip_address'];
+  roomCallColumns: string[] = ['name', 'guest', 'action'];
 
   songSource = new MatTableDataSource<Songs>(DATA_SONG);
   playlistSource = DATA_SONG;
   roomSource = DATA_ROOM;
+  roomCallSource = DATA_ROOM_CALL;
   
   selection = new SelectionModel<Songs>(true, []);
 
-  playlistHeight: any;
-  playerHeight: any;
-
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild(MatSort) songSort: MatSort;
-  @ViewChild('targetPlaylist') playlistElement: any;
-  @ViewChild('targetPlayer') playerElement: any;
 
   constructor() { }
 
@@ -107,17 +128,6 @@ export class OperatorComponent implements OnInit {
     this.songSource.paginator = this.songPaginator;
     this.songSource.sort = this.songSort;
     this.songPaginator._intl.itemsPerPageLabel = 'Songs per page';
-
-    this.playlistHeight = this.playlistElement.nativeElement.offsetHeight - 57;
-    this.playerHeight = this.playerElement.nativeElement.offsetHeight - 57;
-
-    this.playlistHeight = {
-      height: this.playlistHeight + "px"
-    }
-
-    this.playerHeight = {
-      height: this.playerHeight + "px"
-    }
   }
 
   isAllSelected() {

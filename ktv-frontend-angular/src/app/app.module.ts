@@ -15,6 +15,7 @@ import { RemoteComponent } from './components/remote/remote.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { OperatorComponent } from './components/operator/operator.component';
 import { HomeComponent } from './components/home/home.component';
+import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { HomeComponent } from './components/home/home.component';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
+    MDBBootstrapModule.forRoot()
   ],
   providers: [
     PusherService
