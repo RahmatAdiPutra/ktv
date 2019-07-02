@@ -37,3 +37,13 @@
 .mat-cell {
     padding: 5px 5px 5px 5px;
 }
+
+.mat-mini-fab {
+    width: 40px;
+    height: 40px;
+}
+
+.mat-icon {
+    width: 25px;
+    height: 25px;
+}

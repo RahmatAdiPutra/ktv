@@ -109,13 +109,17 @@ export class OperatorComponent implements OnInit {
 
   DATA_PLAYLIST = [];
 
+  DATA_HISTORY = [];
+
   songColumns: string[] = ['select', 'title', 'artist', 'genre', 'language'];
-  playlistColumns: string[] = ['select', 'title', 'artist'];
+  playlistColumns: string[] = ['title', 'artist', 'action'];
+  historyColumns: string[] = ['title', 'artist'];
   roomColumns: string[] = ['name', 'status', 'ip_address'];
   roomCallColumns: string[] = ['name', 'guest', 'action'];
 
   songSource = new MatTableDataSource(DATA_SONG);
   playlistSource = this.DATA_PLAYLIST;
+  historySource = this.DATA_HISTORY;
   roomSource = DATA_ROOM;
   roomCallSource = DATA_ROOM_CALL;
   
