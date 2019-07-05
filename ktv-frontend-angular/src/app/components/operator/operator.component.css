@@ -47,3 +47,11 @@
     width: 25px;
     height: 25px;
 }
+
+.drag-row { 
+    cursor: move;
+}
+
+.text-center th {
+    text-align: center;
+}

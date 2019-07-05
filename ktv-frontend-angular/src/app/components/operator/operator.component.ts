@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 export interface Songs {
   title: string;
@@ -99,6 +99,10 @@ const DATA_ROOM_CALL: RoomCalling[] = [
 
 export class OperatorComponent implements OnInit {
 
+  DATA_PLAYLIST = [];
+
+  DATA_HISTORY = [];
+
   options = [
     {name: 'English'},
     {name: 'Indonesia'},
@@ -107,26 +111,21 @@ export class OperatorComponent implements OnInit {
     {name: 'Mandarin'}
   ];
 
-  DATA_PLAYLIST = [];
-
-  DATA_HISTORY = [];
-
-  songColumns: string[] = ['select', 'title', 'artist', 'genre', 'language'];
+  songColumns: string[] = ['title', 'artist', 'genre', 'language', 'action'];
   playlistColumns: string[] = ['title', 'artist', 'action'];
   historyColumns: string[] = ['title', 'artist'];
   roomColumns: string[] = ['name', 'status', 'ip_address'];
   roomCallColumns: string[] = ['name', 'guest', 'action'];
 
   songSource = new MatTableDataSource(DATA_SONG);
-  playlistSource = this.DATA_PLAYLIST;
+  playlistSource = new MatTableDataSource(this.DATA_PLAYLIST);
   historySource = this.DATA_HISTORY;
   roomSource = DATA_ROOM;
   roomCallSource = DATA_ROOM_CALL;
-  
-  selection = new SelectionModel(true, []);
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild(MatSort) songSort: MatSort;
+  @ViewChild('table') table: MatTable<string[]>;
 
   constructor() { }
 
@@ -136,34 +135,20 @@ export class OperatorComponent implements OnInit {
     this.songPaginator._intl.itemsPerPageLabel = 'Songs per page';
   }
 
-  isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.songSource.data.length;
-    return numSelected === numRows;
+  drop(event: CdkDragDrop<string[]>) {
+    const prevIndex = event.item.data;
+    moveItemInArray(this.playlistSource.data, prevIndex, event.currentIndex);
+    this.table.renderRows();
   }
 
-  masterToggle() {
-    console.log(this.isAllSelected());
-    this.isAllSelected() ?
-        this.selection.clear() :
-        this.songSource.data.forEach(row => this.selection.select(row));
+  addSongToPlaylist(data) {
+    this.DATA_PLAYLIST.push(data)
+    this.playlistSource.connect().next(this.DATA_PLAYLIST);
   }
 
-  checkboxLabel(row?: Songs): string {
-    if (!row) {
-      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
-    }
-    // console.log(row);
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.title + 1}`;
-  }
-
-  tes(data) {
-    this.DATA_PLAYLIST.push(data);
-  }
-
-  addToPlaylist() {
-    this.playlistSource = this.DATA_PLAYLIST;
-    console.log(this.playlistSource);
+  deleteSongFromPlaylist(index) {
+    this.playlistSource.data = this.playlistSource.data.filter((v, k) => k !== index);
+    this.DATA_PLAYLIST = this.playlistSource.data;
   }
 
 }
