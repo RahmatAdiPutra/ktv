@@ -5,17 +5,15 @@
 export const environment = {
   production: false,
   pusher: {
-    key: 'bb225cd958948a709dcb',
+    key: '2c5db2342d2bbac9a70b',
     cluster: 'ap1',
-    authEndpoint: "/broadcasting/auth",
+    authEndpoint: 'http://localhost/1001/ktv/broadcasting/auth',
+    broadcaster: 'pusher',
     httpHost: "sockjs.pusher.com",
-    broadcaster: "pusher",
-    csrfToken: null,
+    encrypted: false,
     disableStats: true,
-    host: null,
-    namespace: "App.Events",
     wsHost: 'localhost',
-    wsPort: 6001,
+    wsPort: 6001
   }
 };
 

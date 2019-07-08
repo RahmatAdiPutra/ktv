@@ -2,14 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
-
-export interface Songs {
-  title: string;
-  artist: string;
-  genre: string;
-  language: string;
-}
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { SongService } from 'src/app/services/song.service';
+import { PusherService } from 'src/app/services/pusher.service';
 
 export interface Rooms {
   name: string;
@@ -21,35 +16,6 @@ export interface RoomCalling {
   name: string;
   guest: string;
 }
-
-const DATA_SONG: Songs[] = [
-  {title: 'a', artist: 'Hydrogen', genre: 'POP', language: 'H'},
-  {title: 'b', artist: 'Helium', genre: 'POP', language: 'He'},
-  {title: 'c', artist: 'Lithium', genre: 'POP', language: 'Li'},
-  {title: 'd', artist: 'Beryllium', genre: 'POP', language: 'Be'},
-  {title: 'e', artist: 'Boron', genre: 'POP', language: 'B'},
-  {title: 'f', artist: 'Carbon', genre: 'POP', language: 'C'},
-  {title: 'g', artist: 'Nitrogen', genre: 'POP', language: 'N'},
-  {title: 'h', artist: 'Oxygen', genre: 'POP', language: 'O'},
-  {title: 'i', artist: 'Fluorine', genre: 'POP', language: 'F'},
-  {title: 'j', artist: 'Neon', genre: 'POP', language: 'Ne'},
-  {title: 'k', artist: 'Hydrogen', genre: 'POP', language: 'H'},
-  {title: 'l', artist: 'Helium', genre: 'POP', language: 'He'},
-  {title: 'm', artist: 'Lithium', genre: 'POP', language: 'Li'},
-  {title: 'n', artist: 'Beryllium', genre: 'POP', language: 'Be'},
-  {title: 'o', artist: 'Boron', genre: 'POP', language: 'B'},
-  {title: 'p', artist: 'Carbon', genre: 'POP', language: 'C'},
-  {title: 'q', artist: 'Nitrogen', genre: 'POP', language: 'N'},
-  {title: 'r', artist: 'Oxygen', genre: 'POP', language: 'O'},
-  {title: 's', artist: 'Fluorine', genre: 'POP', language: 'F'},
-  {title: 't', artist: 'Neon', genre: 'POP', language: 'Ne'},
-  {title: 'u', artist: 'Helium', genre: 'POP', language: 'He'},
-  {title: 'v', artist: 'Lithium', genre: 'POP', language: 'Li'},
-  {title: 'w', artist: 'Beryllium', genre: 'POP', language: 'Be'},
-  {title: 'x', artist: 'Boron', genre: 'POP', language: 'B'},
-  {title: 'y', artist: 'Carbon', genre: 'POP', language: 'C'},
-  {title: 'z', artist: 'Nitrogen', genre: 'POP', language: 'N'},
-];
 
 const DATA_ROOM: Rooms[] = [
   {name:'ktv01', status:'available', ip_address:'192.168.0.1'},
@@ -99,56 +65,86 @@ const DATA_ROOM_CALL: RoomCalling[] = [
 
 export class OperatorComponent implements OnInit {
 
-  DATA_PLAYLIST = [];
-
-  DATA_HISTORY = [];
-
-  options = [
-    {name: 'English'},
-    {name: 'Indonesia'},
-    {name: 'Jepang'},
-    {name: 'Korea'},
-    {name: 'Mandarin'}
-  ];
-
-  songColumns: string[] = ['title', 'artist', 'genre', 'language', 'action'];
-  playlistColumns: string[] = ['title', 'artist', 'action'];
-  historyColumns: string[] = ['title', 'artist'];
-  roomColumns: string[] = ['name', 'status', 'ip_address'];
-  roomCallColumns: string[] = ['name', 'guest', 'action'];
-
-  songSource = new MatTableDataSource(DATA_SONG);
-  playlistSource = new MatTableDataSource(this.DATA_PLAYLIST);
-  historySource = this.DATA_HISTORY;
-  roomSource = DATA_ROOM;
-  roomCallSource = DATA_ROOM_CALL;
+  data: any = [];
+  selects: any = [];
+  params: any = {};
+  sources: any = {};
+  columns: any = {};
+  pages: any = {};
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild(MatSort) songSort: MatSort;
   @ViewChild('table') table: MatTable<string[]>;
 
-  constructor() { }
+  constructor(private songService: SongService, private pusherService: PusherService) {
+    this.data.playlists = [];
+    this.data.histories = [];
+
+    this.columns.songs = ['title', 'artist', 'genre', 'language', 'action'];
+    this.columns.playlists = ['title', 'artist', 'action'];
+    this.columns.histories = ['title', 'artist'];
+    this.columns.rooms = ['name', 'status', 'ip_address'];
+    this.columns.rooms.calls = ['name', 'guest', 'action'];
+
+    this.selects.languages = [
+      {name: 'English'},
+      {name: 'Indonesia'},
+      {name: 'Jepang'},
+      {name: 'Korea'},
+      {name: 'Mandarin'}
+    ];
+
+    this.sources.playlists = new MatTableDataSource(this.data.playlists);
+    this.sources.histories = this.data.histories;
+    this.sources.rooms = DATA_ROOM;
+    this.sources.rooms.calls = DATA_ROOM_CALL;
+
+    // this.pusherService.connect();
+    // window.Echo.private("room").listen("RoomStatusChanged", rooms => {
+    //   console.log("event RoomStatusChanged", rooms);
+    // });
+  }
 
   ngOnInit() {
-    this.songSource.paginator = this.songPaginator;
-    this.songSource.sort = this.songSort;
+    this.params.length = 100;
+    this.songService.getSongs(this.params).subscribe(data => this.payloads(data), error => console.log(error));
+  }
+
+  payloads(res) {
     this.songPaginator._intl.itemsPerPageLabel = 'Songs per page';
+    this.pages.pageSizeOptions = [100, 50, 25, 10];
+    this.pages.pageSize = res.payloads.per_page;
+    this.pages.length = res.payloads.total;
+
+    this.sources.songs = new MatTableDataSource(res.payloads.data);
+    this.sources.songs.paginator = this.songPaginator;
+    this.sources.songs.sort = this.songSort;
+  }
+
+  pageEvent(page) {
+    this.params.start = (page.pageSize * page.pageIndex) + 1;
+    this.params.length = page.pageSize;
+    this.songService.getSongs(this.params).subscribe(data => this.refreshData(data), error => console.log(error));
+  }
+
+  refreshData(res) {
+    this.sources.songs.connect().next(res.payloads.data);
   }
 
   drop(event: CdkDragDrop<string[]>) {
     const prevIndex = event.item.data;
-    moveItemInArray(this.playlistSource.data, prevIndex, event.currentIndex);
+    moveItemInArray(this.sources.playlists.data, prevIndex, event.currentIndex);
     this.table.renderRows();
   }
 
   addSongToPlaylist(data) {
-    this.DATA_PLAYLIST.push(data)
-    this.playlistSource.connect().next(this.DATA_PLAYLIST);
+    this.data.playlists.push(data)
+    this.sources.playlists.connect().next(this.data.playlists);
   }
 
   deleteSongFromPlaylist(index) {
-    this.playlistSource.data = this.playlistSource.data.filter((v, k) => k !== index);
-    this.DATA_PLAYLIST = this.playlistSource.data;
+    this.sources.playlists.data = this.sources.playlists.data.filter((v, k) => k !== index);
+    this.data.playlists = this.sources.playlists.data;
   }
 
 }
