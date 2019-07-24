@@ -26,6 +26,18 @@
     height: 60%;
 }
 
+.selected {
+    background-color: lightgreen;
+}
+
+.text-center th {
+    text-align: center;
+}
+
+.room .mat-row {
+    cursor: pointer;
+}
+
 .mat-tab-group {
     height: 100%;
 }
@@ -34,8 +46,13 @@
     height: auto;
 }
 
+.mat-row:hover {
+    background-color: darkgray;
+}
+
 .mat-cell {
     padding: 5px 5px 5px 5px;
+    font-size: 12px;
 }
 
 .mat-mini-fab {
@@ -48,11 +65,7 @@
     height: 25px;
 }
 
-.text-center th {
-    text-align: center;
-}
-
-.drag-row tr { 
+.cdk-drag {
     cursor: move;
 }
 
@@ -83,6 +96,6 @@
 	transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.drag-row.cdk-drop-list-dragging {
-	transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+.cdk-drop-list-dragging .mat-row{
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

@@ -1,28 +1,29 @@
-<div class="d-flex flex-row vh-100 container-operator overflow-auto">
+<div class="d-flex flex-row vh-100 container-operator">
   <!-- SECTION 1 -->
   <div class="d-flex flex-column w-20">
     <!-- STATUS ROOM -->
-    <div class="h-75 m-1 bg-light">
-      <div class="d-flex flex-column h-100">
-        <div class="overflow-auto">
-          <table mat-table [dataSource]="sources.rooms" class="mat-elevation-z8 w-100 text-center">
+    <div class="h-75">
+      <div class="h-100 d-flex flex-column">
+        <div class="h-100 m-1 overflow-auto bg-light">
+          <table mat-table [dataSource]="sources.rooms" class="mat-elevation-z8 w-100 text-center room">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef> Room </th>
               <td mat-cell *matCellDef="let element"> {{element.name}} </td>
             </ng-container>
-            
+
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef> Status </th>
-              <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.status.name}} </td>
             </ng-container>
-            
+
             <ng-container matColumnDef="ip_address">
               <th mat-header-cell *matHeaderCellDef> IP Address </th>
               <td mat-cell *matCellDef="let element"> {{element.ip_address}} </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="columns.rooms; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: columns.rooms;"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns.rooms; let i = index;" (click)="roomSelect(row)"
+              [ngClass]="data.room.selected[i] ? 'selected' : ''"></tr>
           </table>
         </div>
       </div>
@@ -30,31 +31,31 @@
     <!-- END STATUS ROOM -->
 
     <!-- NOTIFY CALLING -->
-    <div class="h-25 m-1 bg-light">
-      <div class="d-flex flex-column h-100">
-        <div class="overflow-auto">
-          <table mat-table [dataSource]="sources.rooms.calls" class="mat-elevation-z8 w-100 text-center">
+    <div class="h-25">
+      <div class="h-100 d-flex flex-column">
+        <div class="h-100 m-1 overflow-auto bg-light">
+          <table mat-table [dataSource]="sources.calls" class="mat-elevation-z8 w-100 text-center">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef> Room </th>
-              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.room.name}} </td>
             </ng-container>
-            
+
             <ng-container matColumnDef="guest">
               <th mat-header-cell *matHeaderCellDef> Guest </th>
-              <td mat-cell *matCellDef="let element"> {{element.guest}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.room.guest_name}} </td>
             </ng-container>
 
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef> Accept Call </th>
-              <td mat-cell *matCellDef="let element">
-                <button mat-mini-fab color="primary">
+              <td mat-cell *matCellDef="let element; let row">
+                <button mat-mini-fab color="primary" (click)="callSelect(row)">
                   <mat-icon>phone_callback</mat-icon>
                 </button>
               </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="columns.rooms.calls; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: columns.rooms.calls;"></tr>
+            <tr mat-header-row *matHeaderRowDef="columns.calls; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns.calls;"></tr>
           </table>
         </div>
       </div>
@@ -68,40 +69,39 @@
     <!-- SONG -->
     <div class="d-flex flex-column w-60">
       <!-- SONG SEARCHING -->
-      <div class="h-25 m-1 bg-light">
-        <div class="overflow-auto h-100">
-          <div class="d-flex flex-column m-2">
-            <div class="d-flex flex-row">
-              <div class="align-self-center p-1 w-50">
-                <mat-form-field class="w-100">
-                  <input matInput placeholder="Song">
-                </mat-form-field>
-              </div>
-              <div class="align-self-center p-1 w-50">
-                <mat-form-field class="w-100">
-                  <input matInput placeholder="Artist">
-                </mat-form-field>
-              </div>
+      <div class="m-1">
+        <div class="h-100 d-flex flex-column bg-light">
+          <div class="d-flex flex-row">
+            <div class="align-self-center p-1 w-50">
+              <mat-form-field class="w-100">
+                <input matInput placeholder="Song">
+              </mat-form-field>
             </div>
-            <div class="d-flex flex-row">
-              <div class="align-self-center p-1 w-50">
-                <mat-form-field class="w-100">
-                  <mat-select placeholder="Language">
-                    <mat-option *ngFor="let option of selects.languages" [value]="option.name">{{option.name}}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <div class="align-self-center p-1 w-50">
-                <mat-checkbox>New Release</mat-checkbox>
-              </div>
+            <div class="align-self-center p-1 w-50">
+              <mat-form-field class="w-100">
+                <input matInput placeholder="Artist">
+              </mat-form-field>
             </div>
-            <div class="d-flex flex-row">
-              <div class="align-self-center p-1">
-                <button mat-raised-button color="primary">Clear</button>
-              </div>
-              <div class="align-self-center p-1">
-                <button mat-raised-button color="primary">Search</button>
-              </div>
+          </div>
+          <div class="d-flex flex-row">
+            <div class="align-self-center p-1 w-50">
+              <mat-form-field class="w-100">
+                <mat-select placeholder="Language">
+                  <mat-option *ngFor="let option of selects.languages" [value]="option.name">{{option.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="align-self-center p-1 w-50">
+              <mat-checkbox>New Release</mat-checkbox>
+            </div>
+          </div>
+          <div class="d-flex flex-row">
+            <div class="align-self-center p-1">
+              <button mat-raised-button color="primary">Clear</button>
+            </div>
+            <div class="align-self-center p-1">
+              <button mat-raised-button color="primary">Search</button>
             </div>
           </div>
         </div>
@@ -109,30 +109,30 @@
       <!-- END SONG SEARCHING -->
 
       <!-- SONG BANK -->
-      <div class="h-75 m-1 bg-light">
-        <div class="d-flex flex-column h-100">
-          <div class="overflow-auto flex-grow-1 vh-100">
+      <div class="m-1 flex-grow-1 overflow-auto">
+        <div class="h-100 d-flex flex-column">
+          <div class="bg-light overflow-auto flex-grow-1">
             <table mat-table [dataSource]="sources.songs" matSort class="mat-elevation-z8 w-100">
               <ng-container matColumnDef="title">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
                 <td mat-cell *matCellDef="let element"> {{element.title}} </td>
               </ng-container>
-              
+
               <ng-container matColumnDef="artist">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Artist </th>
-                <td mat-cell *matCellDef="let element"> {{element.artist}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.artist_label}} </td>
               </ng-container>
-              
+
               <ng-container matColumnDef="genre">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Genre </th>
                 <td mat-cell *matCellDef="let element"> {{element.genre.name}} </td>
               </ng-container>
-              
+
               <ng-container matColumnDef="language">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Language </th>
                 <td mat-cell *matCellDef="let element"> {{element.language.name}} </td>
               </ng-container>
-              
+
               <ng-container matColumnDef="action">
                 <th mat-header-cell *matHeaderCellDef> Add to playlist </th>
                 <td mat-cell *matCellDef="let element; let row">
@@ -146,8 +146,9 @@
               <tr mat-row *matRowDef="let row; columns: columns.songs;"></tr>
             </table>
           </div>
-          <div class="bg-white">
-            <mat-paginator [pageSizeOptions]="pages.pageSizeOptions" [pageSize]="pages.pageSize" [length]="pages.length" showFirstLastButtons (page)="pageEvent($event)"></mat-paginator>
+          <div class="bg-light">
+            <mat-paginator [pageSizeOptions]="pages.songs.pageSizeOptions" [pageSize]="pages.songs.pageSize"
+              [length]="pages.songs.length" showFirstLastButtons (page)="songPageEvent($event)"></mat-paginator>
           </div>
         </div>
       </div>
@@ -158,110 +159,120 @@
     <!-- PRIVIEW AND PLAYLIST -->
     <div class="d-flex flex-column w-40">
       <!-- PRIVIEW -->
-      <div class="h-40 m-1 bg-light">
-        <mat-tab-group>
-          <mat-tab label="Priview Video">
-            <div class="d-flex flex-column h-100">
-              <div class="d-flex flex-row flex-grow-1 vh-100">
-                <video class="h-100 w-100" controls>
-                  <source src="http://localhost/videos/nirvana.mp4" type="video/mp4">
-                </video>
-              </div>
-              <div class="d-flex flex-row justify-content-center w-100 bg-white">
-                <div class="p-1">
-                  <button mat-mini-fab>
-                    <mat-icon>play_circle_filled</mat-icon>
-                  </button>
+      <div class="h-40">
+        <div class="h-100 d-flex flex-column">
+          <div class="h-100 m-1 overflow-auto bg-light">
+            <mat-tab-group>
+              <mat-tab label="Priview Video">
+                <div class="d-flex flex-column h-100">
+                  <div class="d-flex flex-row flex-grow-1">
+                    <video class="h-100 w-100" controls>
+                      <source src="http://localhost/videos/nirvana.mp4" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="d-flex flex-row justify-content-center w-100 bg-white">
+                    <div class="p-1">
+                      <button mat-mini-fab>
+                        <mat-icon>play_circle_filled</mat-icon>
+                      </button>
+                    </div>
+                    <div class="p-1">
+                      <button mat-mini-fab color="primary">
+                        <mat-icon>stop</mat-icon>
+                      </button>
+                    </div>
+                    <div class="p-1">
+                      <button mat-mini-fab color="warn">
+                        <mat-icon>repeat</mat-icon>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div class="p-1">
-                  <button mat-mini-fab color="primary">
-                    <mat-icon>stop</mat-icon>
-                  </button>
-                </div>
-                <div class="p-1">
-                  <button mat-mini-fab color="warn">
-                    <mat-icon>repeat</mat-icon>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </mat-tab>
-          <mat-tab label="Customer Info">Customer Info</mat-tab>
-          <mat-tab label="Message">Message</mat-tab>
-        </mat-tab-group>
+              </mat-tab>
+              <mat-tab label="Customer Info">Customer Info</mat-tab>
+              <mat-tab label="Message">Message</mat-tab>
+            </mat-tab-group>
+          </div>
+        </div>
       </div>
       <!-- END PRIVIEW -->
 
       <!-- ROOM PLAYLIST -->
-      <div class="h-60 m-1 bg-light">
-        <mat-tab-group>
-          <mat-tab label="Playlist NameRoom">
-            <div class="d-flex flex-column h-100">
-              <div class="overflow-auto flex-grow-1 vh-100">
-                <table mat-table [dataSource]="sources.playlists" class="mat-elevation-z8 w-100 text-center drag-row" #table cdkDropList [cdkDropListData]="playlistSource" (cdkDropListDropped)="drop($event)">
-                  <ng-container matColumnDef="title">
-                    <th mat-header-cell *matHeaderCellDef> Title </th>
-                    <td mat-cell *matCellDef="let element"> {{element.title}} </td>
-                  </ng-container>
-                  
-                  <ng-container matColumnDef="artist">
-                    <th mat-header-cell *matHeaderCellDef> Artist </th>
-                    <td mat-cell *matCellDef="let element"> {{element.artist}} </td>
-                  </ng-container>
-                  
-                  <ng-container matColumnDef="action">
-                    <th mat-header-cell *matHeaderCellDef> Remove from playlist </th>
-                    <td mat-cell *matCellDef="let element; let i = index;">
-                      <button mat-mini-fab color="primary" (click)="deleteSongFromPlaylist(i)">
-                        <mat-icon>remove_circle</mat-icon>
+      <div class="h-60">
+        <div class="h-100 d-flex flex-column">
+          <div class="h-100 m-1 overflow-auto bg-light">
+            <mat-tab-group>
+              <mat-tab label="Playlist {{ data.room.name }}">
+                <div class="d-flex flex-column h-100">
+                  <div class="overflow-auto flex-grow-1 vh-100">
+                    <table mat-table [dataSource]="sources.playlists" class="mat-elevation-z8 w-100 text-center" #table
+                      cdkDropList [cdkDropListData]="sources.playlists" (cdkDropListDropped)="playlistDrop($event)">
+                      <ng-container matColumnDef="title">
+                        <th mat-header-cell *matHeaderCellDef> Title </th>
+                        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="artist">
+                        <th mat-header-cell *matHeaderCellDef> Artist </th>
+                        <td mat-cell *matCellDef="let element"> {{element.artist_label}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef> Remove from playlist </th>
+                        <td mat-cell *matCellDef="let element; let i = index;">
+                          <button mat-mini-fab color="primary" (click)="deleteSongFromPlaylist(i)">
+                            <mat-icon>remove_circle</mat-icon>
+                          </button>
+                        </td>
+                      </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="columns.playlists; sticky: true"></tr>
+                      <tr mat-row *matRowDef="let row; columns: columns.playlists; let i = index;" cdkDrag
+                        [cdkDragData]="[i]"></tr>
+                    </table>
+                  </div>
+                  <div class="d-flex flex-row justify-content-center w-100 bg-white">
+                    <div class="p-1">
+                      <button mat-mini-fab>
+                        <mat-icon>play_circle_filled</mat-icon>
                       </button>
-                    </td>
-                  </ng-container>
+                    </div>
+                    <div class="p-1">
+                      <button mat-mini-fab color="primary">
+                        <mat-icon>stop</mat-icon>
+                      </button>
+                    </div>
+                    <div class="p-1">
+                      <button mat-mini-fab color="warn">
+                        <mat-icon>repeat</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </mat-tab>
+              <mat-tab label="History {{ data.room.name }}">
+                <div class="d-flex flex-column h-100">
+                  <div class="overflow-auto flex-grow-1 vh-100">
+                    <table mat-table [dataSource]="sources.histories" class="mat-elevation-z8 w-100 text-center">
+                      <ng-container matColumnDef="title">
+                        <th mat-header-cell *matHeaderCellDef> Title </th>
+                        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+                      </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="columns.playlists; sticky: true"></tr>
-                  <tr mat-row *matRowDef="let row; columns: columns.playlists; let i = index;" cdkDrag [cdkDragData]="[i]"></tr>
-                </table>
-              </div>
-              <div class="d-flex flex-row justify-content-center w-100 bg-white">
-                <div class="p-1">
-                  <button mat-mini-fab>
-                    <mat-icon>play_circle_filled</mat-icon>
-                  </button>
-                </div>
-                <div class="p-1">
-                  <button mat-mini-fab color="primary">
-                    <mat-icon>stop</mat-icon>
-                  </button>
-                </div>
-                <div class="p-1">
-                  <button mat-mini-fab color="warn">
-                    <mat-icon>repeat</mat-icon>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </mat-tab>
-          <mat-tab label="History NameRoom">
-            <div class="d-flex flex-column h-100">
-              <div class="overflow-auto flex-grow-1 vh-100">
-                <table mat-table [dataSource]="sources.histories" class="mat-elevation-z8 w-100">
-                  <ng-container matColumnDef="title">
-                    <th mat-header-cell *matHeaderCellDef> Title </th>
-                    <td mat-cell *matCellDef="let element"> {{element.title}} </td>
-                  </ng-container>
-                  
-                  <ng-container matColumnDef="artist">
-                    <th mat-header-cell *matHeaderCellDef> Artist </th>
-                    <td mat-cell *matCellDef="let element"> {{element.artist}} </td>
-                  </ng-container>
+                      <ng-container matColumnDef="artist">
+                        <th mat-header-cell *matHeaderCellDef> Artist </th>
+                        <td mat-cell *matCellDef="let element"> {{element.artist}} </td>
+                      </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="columns.histories; sticky: true"></tr>
-                  <tr mat-row *matRowDef="let row; columns: columns.histories;"></tr>
-                </table>
-              </div>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
+                      <tr mat-header-row *matHeaderRowDef="columns.histories; sticky: true"></tr>
+                      <tr mat-row *matRowDef="let row; columns: columns.histories;"></tr>
+                    </table>
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        </div>
       </div>
       <!-- END ROOM PLAYLIST -->
     </div>

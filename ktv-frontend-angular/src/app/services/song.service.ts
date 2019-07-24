@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Order } from 'src/app/classes/order';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,20 @@ export class SongService {
 
   constructor(private http: HttpClient) { }
 
-  getSongs(params) {
+  getSong(data) {
+    let params = new HttpParams();
+    let order = new Order();
+
+    for (let key in data) {
+      if (key == order.by.column) {
+        params = params.append("order[0][column]",data[key]);
+      } else if (key == order.by.dir) {
+        params = params.append("order[0][dir]",data[key]);
+      } else {
+        params = params.append(key,data[key]);
+      }
+    }
+
     return this.http.get(this.endPoint,{
       params:params
     }).pipe(catchError(this.errorHandler));
