@@ -44,6 +44,10 @@ export class RoomService {
     return this.http.post(this.endPoint+"post-playlist", data).pipe(catchError(this.errorHandler));
   }
 
+  postCall(data) {
+    return this.http.post(this.endPoint+"post-call", data).pipe(catchError(this.errorHandler));
+  }
+
   errorHandler(error: HttpErrorResponse) {
     return throwError(error.message || "Server error");
   }

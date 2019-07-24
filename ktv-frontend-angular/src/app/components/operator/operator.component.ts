@@ -7,57 +7,6 @@ import { SongService } from 'src/app/services/song.service';
 import { PusherService } from 'src/app/services/pusher.service';
 import { RoomService } from 'src/app/services/room.service';
 
-export interface Rooms {
-  name: string;
-  status: string;
-  ip_address: string;
-}
-
-export interface RoomCalling {
-  name: string;
-  guest: string;
-}
-
-const DATA_ROOM: Rooms[] = [
-  {name:'ktv01', status:'available', ip_address:'192.168.0.1'},
-  {name:'ktv02', status:'available', ip_address:'192.168.0.2'},
-  {name:'ktv03', status:'available', ip_address:'192.168.0.3'},
-  {name:'ktv04', status:'available', ip_address:'192.168.0.4'},
-  {name:'ktv05', status:'available', ip_address:'192.168.0.5'},
-  {name:'ktv06', status:'available', ip_address:'192.168.0.6'},
-  {name:'ktv07', status:'available', ip_address:'192.168.0.7'},
-  {name:'ktv08', status:'available', ip_address:'192.168.0.8'},
-  {name:'ktv09', status:'available', ip_address:'192.168.0.9'},
-  {name:'ktv10', status:'available', ip_address:'192.168.0.10'},
-  {name:'ktv11', status:'available', ip_address:'192.168.0.11'},
-  {name:'ktv12', status:'available', ip_address:'192.168.0.12'},
-  {name:'ktv13', status:'available', ip_address:'192.168.0.13'},
-  {name:'ktv14', status:'available', ip_address:'192.168.0.14'},
-  {name:'ktv15', status:'available', ip_address:'192.168.0.15'},
-  {name:'ktv16', status:'available', ip_address:'192.168.0.16'},
-  {name:'ktv17', status:'available', ip_address:'192.168.0.17'},
-  {name:'ktv18', status:'available', ip_address:'192.168.0.18'},
-  {name:'ktv19', status:'available', ip_address:'192.168.0.19'},
-  {name:'ktv20', status:'available', ip_address:'192.168.0.20'},
-  {name:'ktv21', status:'available', ip_address:'192.168.0.21'},
-  {name:'ktv22', status:'available', ip_address:'192.168.0.22'},
-  {name:'ktv23', status:'available', ip_address:'192.168.0.23'},
-  {name:'ktv24', status:'available', ip_address:'192.168.0.24'},
-  {name:'ktv25', status:'available', ip_address:'192.168.0.25'},
-];
-
-const DATA_ROOM_CALL: RoomCalling[] = [
-  {name:'ktv01', guest:'joko'},
-  {name:'ktv02', guest:'jaka'},
-  {name:'ktv03', guest:'jarwo'},
-  {name:'ktv04', guest:'budi'},
-  {name:'ktv05', guest:'badi'},
-  {name:'ktv06', guest:'baki'},
-  {name:'ktv07', guest:'bagus'},
-  {name:'ktv08', guest:'jasmi'},
-  {name:'ktv09', guest:'john'},
-];
-
 @Component({
   selector: 'app-operator',
   templateUrl: './operator.component.html',
@@ -73,11 +22,13 @@ export class OperatorComponent implements OnInit {
   columns: any = {};
   pages: any = {};
   order: any = {};
-  selected: boolean = false;
+  selected = false;
+  videoUrl: any = '';
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild(MatSort) songSort: MatSort;
   @ViewChild('table') table: MatTable<string[]>;
+  @ViewChild('videoSource') videoSource;
 
   constructor(
     private pusherService: PusherService,
@@ -87,22 +38,23 @@ export class OperatorComponent implements OnInit {
     this.data.playlists = [];
     this.data.histories = [];
     this.data.room = {};
+    this.data.call = {};
     this.pages.songs = {};
     this.params.songs = {};
     this.params.rooms = {};
 
-    this.columns.songs = ['title', 'artist', 'genre', 'language', 'action'];
-    this.columns.playlists = ['title', 'artist', 'action'];
+    this.columns.songs = ['action', 'title', 'artist', 'genre', 'language'];
+    this.columns.playlists = ['action', 'title', 'artist'];
     this.columns.histories = ['title', 'artist'];
     this.columns.rooms = ['name', 'status', 'ip_address'];
-    this.columns.calls = ['name', 'guest', 'action'];
+    this.columns.calls = ['action', 'name', 'guest'];
 
     this.selects.languages = [
-      {name: 'English'},
-      {name: 'Indonesia'},
-      {name: 'Jepang'},
-      {name: 'Korea'},
-      {name: 'Mandarin'}
+      { name: 'English' },
+      { name: 'Indonesia' },
+      { name: 'Jepang' },
+      { name: 'Korea' },
+      { name: 'Mandarin' }
     ];
 
     this.sources.histories = new MatTableDataSource(this.data.histories);
@@ -136,8 +88,15 @@ export class OperatorComponent implements OnInit {
   }
 
   call(res) {
-    console.log(res);
     this.sources.calls = new MatTableDataSource(res.payloads.data);
+  }
+
+  video(data) {
+    console.log(data);
+    this.videoUrl = 'http://localhost/' + data.file_path;
+    console.log(this.videoSource);
+    this.videoSource.nativeElement.setAttribute('src', this.videoUrl);
+    // this.videoSource.nativeElement.onload();
   }
 
   songPageEvent(page) {
@@ -151,7 +110,7 @@ export class OperatorComponent implements OnInit {
   }
 
   roomRefresh(res) {
-    this.sources.rooms = new MatTableDataSource(res.payloads.data); 
+    this.sources.rooms = new MatTableDataSource(res.payloads.data);
   }
 
   roomPlaylist(res) {
@@ -160,9 +119,9 @@ export class OperatorComponent implements OnInit {
   }
 
   roomSelect(data) {
-    console.log(data);
+    // console.log(data);
     this.roomClearSelect(this.sources.rooms.data);
-    let index = this.sources.rooms.data.indexOf(data);
+    const index = this.sources.rooms.data.indexOf(data);
     this.data.room.selected[index] = !this.data.room.selected[index];
     this.data.room.name = data.active_session_id ? data.name : '';
     this.data.room.session = data.active_session_id;
@@ -172,18 +131,21 @@ export class OperatorComponent implements OnInit {
     } else {
       this.data.playlists = [];
       this.sources.playlists = [];
-      console.log("Room session not active");
+      console.log('Room session not active');
     }
   }
 
   callSelect(data) {
     console.log(data);
+    this.data.call.id = data.room_id;
+    this.data.call.from = data.call_type;
+    this.roomService.postCall(this.data.call).subscribe(res => console.log(res), error => console.log(error));
     this.roomSelect(this.sources.rooms.data.find((v, k) => v.id === data.room_id));
   }
 
   roomClearSelect(data) {
     this.data.room.selected = [];
-    data.forEach((v,k) => {
+    data.forEach((v, k) => {
       this.data.room.selected[k] = this.selected;
     });
   }
@@ -198,7 +160,7 @@ export class OperatorComponent implements OnInit {
 
   addSongToPlaylist(data) {
     if (this.data.room.session) {
-      let allow = this.sources.playlists.data.filter((v, k) => v.id === data.id);
+      const allow = this.sources.playlists.data.filter((v, k) => v.id === data.id);
       if (allow.length) {
         return false;
       }
@@ -206,7 +168,7 @@ export class OperatorComponent implements OnInit {
       this.sources.playlists.connect().next(this.data.playlists);
       this.roomPostPlaylist(this.data.playlists);
     } else {
-      console.log("Room session not active");
+      console.log('Room session not active');
     }
   }
 
@@ -214,13 +176,13 @@ export class OperatorComponent implements OnInit {
     this.data.room.playlists = {};
     this.data.room.playlists.room_session_id = this.data.room.session;
     this.data.room.addPlaylists = [];
-    data.forEach((v,k) => {
+    data.forEach((v, k) => {
       this.data.room.playlist = {
-        song_id : v.id,
-        is_played : 0,
-        order_num : k,
-        count_play : 1
-      }
+        song_id: v.id,
+        is_played: 0,
+        order_num: k,
+        count_play: 1
+      };
       this.data.room.addPlaylists.push(this.data.room.playlist);
     });
     this.data.room.playlists.playlist = this.data.room.addPlaylists;
@@ -234,23 +196,18 @@ export class OperatorComponent implements OnInit {
   }
 
   privateChannel() {
-    window.Echo.private("room").listen("RoomStatusChanged", rooms => {
-      console.log("event RoomStatusChanged", rooms);
+    window.Echo.private('room').listen('RoomStatusChanged', rooms => {
+      console.log('event RoomStatusChanged', rooms);
       this.roomService.getRoom(this.params.rooms).subscribe(res => this.roomRefresh(res), error => console.log(error));
       this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
-    }).listen("Calling", room => {
-      console.log("Calling room", room);
-      if (room.to !== "operator") {
-          // hanya listening panggilan untuk operator
-          return;
+    }).listen('Calling', room => {
+      console.log('Calling room', room);
+      if (room.to !== 'operator') {
+        // hanya listening panggilan untuk operator
+        return;
       }
 
-      if (room.isResponded === false) {
-          // belum di response oleh operator, tampilkan
-          this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
-      } else {
-          // sudah di response, clear
-      }
+      this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
     });
   }
 
