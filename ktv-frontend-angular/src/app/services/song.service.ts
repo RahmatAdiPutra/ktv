@@ -9,30 +9,32 @@ import { Order } from 'src/app/classes/order';
 })
 export class SongService {
 
-  endPoint = 'http://localhost/1001/ktv/transaction-data/song/data';
+  endPoint = 'http://localhost/1001/ktv/';
 
   constructor(private http: HttpClient) { }
 
+  getLanguage() {
+    return this.http.get(this.endPoint + 'master-data/song/language/data').pipe(catchError(this.errorHandler));
+  }
+
   getSong(data) {
     let params = new HttpParams();
-    let order = new Order();
+    const order = new Order();
 
-    for (let key in data) {
-      if (key == order.by.column) {
-        params = params.append("order[0][column]",data[key]);
-      } else if (key == order.by.dir) {
-        params = params.append("order[0][dir]",data[key]);
+    for (const key in data) {
+      if (key === order.by.column) {
+        params = params.append('order[0][column]', data[key]);
+      } else if (key === order.by.dir) {
+        params = params.append('order[0][dir]', data[key]);
       } else {
-        params = params.append(key,data[key]);
+        params = params.append(key, data[key]);
       }
     }
 
-    return this.http.get(this.endPoint,{
-      params:params
-    }).pipe(catchError(this.errorHandler));
+    return this.http.get(this.endPoint + 'transaction-data/song/data', {params}).pipe(catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {
-    return throwError(error.message || "Server error");
+    return throwError(error.message || 'Server error');
   }
 }

@@ -15,40 +15,38 @@ export class RoomService {
 
   getRoom(data) {
     let params = new HttpParams();
-    let order = new Order();
+    const order = new Order();
 
-    for (let key in data) {
-      if (key == order.by.column) {
-        params = params.append("order[0][column]",data[key]);
-      } else if (key == order.by.dir) {
-        params = params.append("order[0][dir]",data[key]);
+    for (const key in data) {
+      if (key === order.by.column) {
+        params = params.append('order[0][column]', data[key]);
+      } else if (key === order.by.dir) {
+        params = params.append('order[0][dir]', data[key]);
       } else {
-        params = params.append(key,data[key]);
+        params = params.append(key, data[key]);
       }
     }
 
-    return this.http.get(this.endPoint+"data",{
-      params:params
-    }).pipe(catchError(this.errorHandler));
+    return this.http.get(this.endPoint + 'data', {params}).pipe(catchError(this.errorHandler));
   }
 
   getPlaylist(data) {
-    return this.http.get(this.endPoint+"room-playlist/"+data).pipe(catchError(this.errorHandler));
+    return this.http.get(this.endPoint + 'room-playlist/' + data).pipe(catchError(this.errorHandler));
   }
 
   getCall() {
-    return this.http.get(this.endPoint+"room-call").pipe(catchError(this.errorHandler));
+    return this.http.get(this.endPoint + 'room-call').pipe(catchError(this.errorHandler));
   }
 
   postPlaylist(data) {
-    return this.http.post(this.endPoint+"post-playlist", data).pipe(catchError(this.errorHandler));
+    return this.http.post(this.endPoint + 'post-playlist', data).pipe(catchError(this.errorHandler));
   }
 
   postCall(data) {
-    return this.http.post(this.endPoint+"post-call", data).pipe(catchError(this.errorHandler));
+    return this.http.post(this.endPoint + 'post-call', data).pipe(catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {
-    return throwError(error.message || "Server error");
+    return throwError(error.message || 'Server error');
   }
 }

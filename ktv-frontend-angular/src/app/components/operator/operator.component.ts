@@ -16,17 +16,16 @@ import { RoomService } from 'src/app/services/room.service';
 export class OperatorComponent implements OnInit {
 
   data: any = {};
-  selects: any = {};
-  params: any = {};
-  sources: any = {};
-  columns: any = {};
-  pages: any = {};
-  order: any = {};
+  select: any = {};
+  param: any = {};
+  source: any = {};
+  column: any = {};
+  page: any = {};
+  form: any = {};
   selected = false;
   videoUrl: any = '';
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
-  @ViewChild(MatSort) songSort: MatSort;
   @ViewChild('table') table: MatTable<string[]>;
   @ViewChild('videoSource') videoSource;
 
@@ -39,56 +38,56 @@ export class OperatorComponent implements OnInit {
     this.data.histories = [];
     this.data.room = {};
     this.data.call = {};
-    this.pages.songs = {};
-    this.params.songs = {};
-    this.params.rooms = {};
+    this.page.song = {};
+    this.param.song = {};
+    this.param.room = {};
+    this.form.search = {};
 
-    this.columns.songs = ['action', 'title', 'artist', 'genre', 'language'];
-    this.columns.playlists = ['action', 'title', 'artist'];
-    this.columns.histories = ['title', 'artist'];
-    this.columns.rooms = ['name', 'status', 'ip_address'];
-    this.columns.calls = ['action', 'name', 'guest'];
+    this.column.songs = ['action', 'title', 'artist', 'genre', 'language'];
+    this.column.playlists = ['action', 'title', 'artist'];
+    this.column.histories = ['title', 'artist'];
+    this.column.rooms = ['name', 'status', 'ip_address'];
+    this.column.calls = ['action', 'name', 'guest'];
 
-    this.selects.languages = [
-      { name: 'English' },
-      { name: 'Indonesia' },
-      { name: 'Jepang' },
-      { name: 'Korea' },
-      { name: 'Mandarin' }
-    ];
-
-    this.sources.histories = new MatTableDataSource(this.data.histories);
+    this.source.histories = new MatTableDataSource(this.data.histories);
 
     this.pusherService.connect();
     this.privateChannel();
+    this.formSearchClear();
   }
 
   ngOnInit() {
-    this.params.songs.length = 100;
-    this.params.rooms.orderColumn = '2';
-    this.params.rooms.orderDir = 'asc';
-    this.songService.getSong(this.params.songs).subscribe(res => this.song(res), error => console.log(error));
-    this.roomService.getRoom(this.params.rooms).subscribe(res => this.room(res), error => console.log(error));
+    this.param.song.length = 25;
+    this.param.song.orderColumn = '3';
+    this.param.song.orderDir = 'desc';
+    this.param.room.orderColumn = '2';
+    this.param.room.orderDir = 'asc';
+    this.songService.getLanguage().subscribe(res => this.language(res), error => console.log(error));
+    this.songService.getSong(this.param.song).subscribe(res => this.song(res), error => console.log(error));
+    this.roomService.getRoom(this.param.room).subscribe(res => this.room(res), error => console.log(error));
     this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
   }
 
+  language(res) {
+    this.select.languages = res.payloads.data;
+  }
+
   song(res) {
-    this.sources.songs = new MatTableDataSource(res.payloads.data);
-    this.sources.songs.paginator = this.songPaginator;
-    this.sources.songs.sort = this.songSort;
-    this.pages.songs.pageSizeOptions = [100, 50, 25, 10];
-    this.pages.songs.pageSize = res.payloads.per_page;
-    this.pages.songs.length = res.payloads.total;
+    this.source.songs = new MatTableDataSource(res.payloads.data);
+    this.source.songs.paginator = this.songPaginator;
+    this.page.song.pageSizeOptions = [100, 50, 25, 10];
+    this.page.song.pageSize = res.payloads.per_page;
+    this.page.song.length = res.payloads.total;
     this.songPaginator._intl.itemsPerPageLabel = 'Song per page';
   }
 
   room(res) {
     this.roomClearSelect(res.payloads.data);
-    this.sources.rooms = new MatTableDataSource(res.payloads.data);
+    this.source.rooms = new MatTableDataSource(res.payloads.data);
   }
 
   call(res) {
-    this.sources.calls = new MatTableDataSource(res.payloads.data);
+    this.source.calls = new MatTableDataSource(res.payloads.data);
   }
 
   video(data) {
@@ -100,28 +99,31 @@ export class OperatorComponent implements OnInit {
   }
 
   songPageEvent(page) {
-    this.params.songs.start = (page.pageSize * page.pageIndex) + 1;
-    this.params.songs.length = page.pageSize;
-    this.songService.getSong(this.params.songs).subscribe(res => this.songRefresh(res), error => console.log(error));
+    this.param.song.start = page.pageSize * page.pageIndex;
+    this.param.song.length = page.pageSize;
+    this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
   }
 
   songRefresh(res) {
-    this.sources.songs.connect().next(res.payloads.data);
+    this.source.songs.connect().next(res.payloads.data);
+    this.page.song.pageSize = res.payloads.per_page;
+    this.page.song.length = res.payloads.total;
   }
 
   roomRefresh(res) {
-    this.sources.rooms = new MatTableDataSource(res.payloads.data);
+    this.source.rooms = new MatTableDataSource(res.payloads.data);
+    this.roomSelect(this.source.rooms.data.find((v, k) => v.active_session_id === this.data.room.session));
   }
 
   roomPlaylist(res) {
     this.data.playlists = res.payloads.data.songs;
-    this.sources.playlists = new MatTableDataSource(this.data.playlists);
+    this.source.playlists = new MatTableDataSource(this.data.playlists);
   }
 
   roomSelect(data) {
-    // console.log(data);
-    this.roomClearSelect(this.sources.rooms.data);
-    const index = this.sources.rooms.data.indexOf(data);
+    if (typeof data === 'undefined') { return; }
+    this.roomClearSelect(this.source.rooms.data);
+    const index = this.source.rooms.data.indexOf(data);
     this.data.room.selected[index] = !this.data.room.selected[index];
     this.data.room.name = data.active_session_id ? data.name : '';
     this.data.room.session = data.active_session_id;
@@ -130,17 +132,17 @@ export class OperatorComponent implements OnInit {
       this.presenceChannel(this.data.room.session);
     } else {
       this.data.playlists = [];
-      this.sources.playlists = [];
+      this.source.playlists = [];
       console.log('Room session not active');
     }
   }
 
   callSelect(data) {
-    console.log(data);
+    // console.log(data);
     this.data.call.id = data.room_id;
     this.data.call.from = data.call_type;
     this.roomService.postCall(this.data.call).subscribe(res => console.log(res), error => console.log(error));
-    this.roomSelect(this.sources.rooms.data.find((v, k) => v.id === data.room_id));
+    this.roomSelect(this.source.rooms.data.find((v, k) => v.id === data.room_id));
   }
 
   roomClearSelect(data) {
@@ -152,20 +154,20 @@ export class OperatorComponent implements OnInit {
 
   playlistDrop(event: CdkDragDrop<string[]>) {
     const prevIndex = event.item.data;
-    moveItemInArray(this.sources.playlists.data, prevIndex, event.currentIndex);
+    moveItemInArray(this.source.playlists.data, prevIndex, event.currentIndex);
     this.table.renderRows();
-    this.data.playlists = this.sources.playlists.data;
+    this.data.playlists = this.source.playlists.data;
     this.roomPostPlaylist(this.data.playlists);
   }
 
   addSongToPlaylist(data) {
     if (this.data.room.session) {
-      const allow = this.sources.playlists.data.filter((v, k) => v.id === data.id);
+      const allow = this.source.playlists.data.filter((v, k) => v.id === data.id);
       if (allow.length) {
         return false;
       }
       this.data.playlists.push(data);
-      this.sources.playlists.connect().next(this.data.playlists);
+      this.source.playlists.connect().next(this.data.playlists);
       this.roomPostPlaylist(this.data.playlists);
     } else {
       console.log('Room session not active');
@@ -190,23 +192,20 @@ export class OperatorComponent implements OnInit {
   }
 
   deleteSongFromPlaylist(index) {
-    this.sources.playlists.data = this.sources.playlists.data.filter((v, k) => k !== index);
-    this.data.playlists = this.sources.playlists.data;
+    this.source.playlists.data = this.source.playlists.data.filter((v, k) => k !== index);
+    this.data.playlists = this.source.playlists.data;
     this.roomPostPlaylist(this.data.playlists);
   }
 
   privateChannel() {
     window.Echo.private('room').listen('RoomStatusChanged', rooms => {
       console.log('event RoomStatusChanged', rooms);
-      this.roomService.getRoom(this.params.rooms).subscribe(res => this.roomRefresh(res), error => console.log(error));
-      this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
+      this.roomService.getRoom(this.param.room).subscribe(res => this.roomRefresh(res), error => console.log(error));
     }).listen('Calling', room => {
       console.log('Calling room', room);
       if (room.to !== 'operator') {
-        // hanya listening panggilan untuk operator
         return;
       }
-
       this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
     });
   }
@@ -219,6 +218,22 @@ export class OperatorComponent implements OnInit {
 
   leavePresenceChannel(sessionId) {
     window.Echo.leave(`room-playlist.${sessionId}`);
+  }
+
+  formSearch() {
+    this.form.search.new = this.form.search.new ? 1 : 0;
+    // tslint:disable-next-line: forin
+    for (const key in this.form.search) {
+      this.param.song[key] = this.form.search[key];
+    }
+    this.songService.getSong(this.form.search).subscribe(res => this.songRefresh(res), error => console.log(error));
+  }
+
+  formSearchClear() {
+    this.form.search.song = '';
+    this.form.search.artist = '';
+    this.form.search.language = '';
+    this.form.search.new = false;
   }
 
 }
