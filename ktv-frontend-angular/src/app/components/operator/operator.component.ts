@@ -53,7 +53,6 @@ export class OperatorComponent implements OnInit {
 
     this.pusherService.connect();
     this.privateChannel();
-    this.formSearchClear();
   }
 
   ngOnInit() {
@@ -233,7 +232,8 @@ export class OperatorComponent implements OnInit {
     this.form.search.song = '';
     this.form.search.artist = '';
     this.form.search.language = '';
-    this.form.search.new = false;
+    this.form.search.new = 0;
+    this.songService.getSong(this.form.search).subscribe(res => this.songRefresh(res), error => console.log(error));
   }
 
 }
