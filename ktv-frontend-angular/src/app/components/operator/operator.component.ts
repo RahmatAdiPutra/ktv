@@ -21,8 +21,9 @@ export class OperatorComponent implements OnInit {
   column: any = {};
   page: any = {};
   form: any = {};
+  video: any = {};
+
   selected = false;
-  videoUrl: any = '';
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild('table') table: MatTable<string[]>;
@@ -48,6 +49,10 @@ export class OperatorComponent implements OnInit {
     this.column.calls = ['action', 'name', 'guest'];
 
     this.source.histories = new MatTableDataSource(this.data.histories);
+
+    this.video.server = 'http://localhost/';
+    this.video.url = '';
+    this.video.autoplay = false;
 
     this.pusherService.connect();
     this.privateChannel();
@@ -85,10 +90,6 @@ export class OperatorComponent implements OnInit {
 
   call(res) {
     this.source.calls = new MatTableDataSource(res.payloads.data);
-  }
-
-  video(data) {
-    this.videoUrl = 'http://localhost/' + data.file_path;
   }
 
   songPageEvent(page) {
@@ -142,6 +143,10 @@ export class OperatorComponent implements OnInit {
     this.roomSelect(this.source.rooms.data.find((v, k) => v.id === data.room_id));
   }
 
+  videoSelect(data) {
+    this.video.url = this.video.server + data.file_path;
+  }
+
   roomClearSelect(data) {
     this.data.room.selected = [];
     data.forEach((v, k) => {
@@ -160,9 +165,7 @@ export class OperatorComponent implements OnInit {
   addSongToPlaylist(data) {
     if (this.data.room.session) {
       const allow = this.source.playlists.data.filter((v, k) => v.id === data.id);
-      if (allow.length) {
-        return false;
-      }
+      if (allow.length) { return; }
       this.data.playlists.push(data);
       this.source.playlists.connect().next(this.data.playlists);
       this.roomPostPlaylist(this.data.playlists);
@@ -200,9 +203,7 @@ export class OperatorComponent implements OnInit {
       this.roomService.getRoom(this.param.room).subscribe(res => this.roomRefresh(res), error => console.log(error));
     }).listen('Calling', room => {
       console.log('Calling room', room);
-      if (room.to !== 'operator') {
-        return;
-      }
+      if (room.to !== 'operator') { return; }
       this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
     });
   }
@@ -219,10 +220,6 @@ export class OperatorComponent implements OnInit {
 
   formSearch() {
     this.form.search.new = this.form.search.new ? 1 : 0;
-    // tslint:disable-next-line: forin
-    for (const key in this.form.search) {
-      this.param.song[key] = this.form.search[key];
-    }
     this.songService.getSong(this.form.search).subscribe(res => this.songRefresh(res), error => console.log(error));
   }
 

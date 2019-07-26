@@ -143,7 +143,7 @@
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="column.songs; sticky: true"></tr>
-              <tr mat-row *matRowDef="let row; columns: column.songs;" (click)="video(row)"></tr>
+              <tr mat-row *matRowDef="let row; columns: column.songs;" (click)="videoSelect(row)"></tr>
             </table>
           </div>
           <div class="bg-light">
@@ -166,7 +166,7 @@
               <mat-tab label="Priview Video">
                 <div class="d-flex flex-column h-100">
                   <div class="d-flex flex-row flex-grow-1">
-                    <video class="h-100 w-100" [src]="videoUrl" controls disablePictureInPicture
+                    <video class="h-100 w-100" [src]="video.url" [autoplay]="video.autoplay" controls disablePictureInPicture
                       controlsList="nodownload">
                     </video>
                   </div>
@@ -210,7 +210,7 @@
                       </ng-container>
 
                       <tr mat-header-row *matHeaderRowDef="column.playlists; sticky: true"></tr>
-                      <tr mat-row *matRowDef="let row; columns: column.playlists; let i = index;" cdkDrag
+                      <tr mat-row *matRowDef="let row; columns: column.playlists; let i = index;" (click)="videoSelect(row)" cdkDrag
                         [cdkDragData]="[i]"></tr>
                     </table>
                   </div>
