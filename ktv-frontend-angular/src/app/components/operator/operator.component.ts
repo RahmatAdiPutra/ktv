@@ -147,6 +147,17 @@ export class OperatorComponent implements OnInit {
     this.video.url = this.video.server + data.file_path;
   }
 
+  videoMetadata(event) {
+    console.log('metadata: ', event);
+    console.log('duration: ', event.srcElement.duration);
+    // const duration = 1000;
+    const duration = event.srcElement.duration / 1000;
+    console.log(duration);
+    setTimeout (() => {
+      console.log('Hello from setTimeout');
+    }, duration * 1000);
+  }
+
   roomClearSelect(data) {
     this.data.room.selected = [];
     data.forEach((v, k) => {

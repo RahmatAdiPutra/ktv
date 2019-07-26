@@ -166,8 +166,9 @@
               <mat-tab label="Priview Video">
                 <div class="d-flex flex-column h-100">
                   <div class="d-flex flex-row flex-grow-1">
-                    <video class="h-100 w-100" [src]="video.url" [autoplay]="video.autoplay" controls disablePictureInPicture
+                    <video class="h-100 w-100" [src]="video.url" (loadedmetadata)="videoMetadata($event)" [autoplay]="video.autoplay" controls disablePictureInPicture
                       controlsList="nodownload">
+                      <source [src]="video.url" type="video/mp4">
                     </video>
                   </div>
                 </div>
