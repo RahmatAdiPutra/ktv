@@ -26,7 +26,6 @@ export class OperatorComponent implements OnInit {
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild('table') table: MatTable<string[]>;
-  @ViewChild('videoSource') videoSource;
 
   constructor(
     private pusherService: PusherService,

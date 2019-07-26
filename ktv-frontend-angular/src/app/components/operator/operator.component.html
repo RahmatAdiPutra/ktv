@@ -166,9 +166,8 @@
               <mat-tab label="Priview Video">
                 <div class="d-flex flex-column h-100">
                   <div class="d-flex flex-row flex-grow-1">
-                    <video class="h-100 w-100" [attr.src]="videoUrl" controls disablePictureInPicture
+                    <video class="h-100 w-100" [src]="videoUrl" controls disablePictureInPicture
                       controlsList="nodownload">
-                      <source #videoSource [src]="videoUrl" type="video/mp4">
                     </video>
                   </div>
                 </div>
