@@ -119,6 +119,10 @@ export class OperatorComponent implements OnInit {
     this.source.playlists = new MatTableDataSource(this.data.playlists);
   }
 
+  roomRefreshPlaylist(res) {
+    this.source.playlists.connect().next(res.payloads.data.songs);
+  }
+
   roomSelect(data) {
     if (typeof data === 'undefined') { return; }
     this.roomClearSelect(this.source.rooms.data);
@@ -211,7 +215,7 @@ export class OperatorComponent implements OnInit {
 
   presenceChannel(sessionId) {
     window.Echo.join(`room-playlist.${sessionId}`).listen('RoomPlaylist', (rooms) => {
-      this.roomService.getPlaylist(this.data.room.session).subscribe(res => this.roomPlaylist(res), error => console.log(error));
+      this.roomService.getPlaylist(this.data.room.session).subscribe(res => this.roomRefreshPlaylist(res), error => console.log(error));
     });
   }
 
