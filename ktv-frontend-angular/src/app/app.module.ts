@@ -5,6 +5,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 
+import { MatVideoModule } from 'mat-video';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
@@ -37,6 +39,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
     BrowserAnimationsModule,
     DragDropModule,
     HttpClientModule,
+    MatVideoModule,
     MaterialModule,
     MDBBootstrapModule.forRoot()
   ],

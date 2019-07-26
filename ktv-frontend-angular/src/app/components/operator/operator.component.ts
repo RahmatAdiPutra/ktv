@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SongService } from 'src/app/services/song.service';
 import { PusherService } from 'src/app/services/pusher.service';
@@ -90,11 +89,7 @@ export class OperatorComponent implements OnInit {
   }
 
   video(data) {
-    console.log(data);
     this.videoUrl = 'http://localhost/' + data.file_path;
-    console.log(this.videoSource);
-    this.videoSource.nativeElement.setAttribute('src', this.videoUrl);
-    // this.videoSource.nativeElement.onload();
   }
 
   songPageEvent(page) {
