@@ -27,6 +27,7 @@ export class OperatorComponent implements OnInit {
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
   @ViewChild('table') table: MatTable<string[]>;
+  @ViewChild('videoPlayer') videoPlayer;
 
   constructor(
     private pusherService: PusherService,
@@ -47,8 +48,6 @@ export class OperatorComponent implements OnInit {
     this.column.histories = ['title', 'artist'];
     this.column.rooms = ['name', 'status', 'ip_address'];
     this.column.calls = ['action', 'name', 'guest'];
-
-    this.source.histories = new MatTableDataSource(this.data.histories);
 
     this.video.server = 'http://localhost/';
     this.video.url = '';
@@ -110,12 +109,26 @@ export class OperatorComponent implements OnInit {
   }
 
   roomPlaylist(res) {
-    this.data.playlists = res.payloads.data.songs;
+    this.data.playlists = res.payloads.data;
     this.source.playlists = new MatTableDataSource(this.data.playlists);
   }
 
+  roomHistoryPlaylist(res) {
+    this.data.histories = res.payloads.data;
+    this.source.histories = new MatTableDataSource(this.data.histories);
+  }
+
   roomRefreshPlaylist(res) {
-    this.source.playlists.connect().next(res.payloads.data.songs);
+    this.data.playlists = res.payloads.data;
+    this.source.playlists.connect().next(this.data.playlists);
+    if (this.data.room.play) {
+      this.videoPlay();
+    }
+  }
+
+  roomRefreshHistoryPlaylist(res) {
+    this.data.histories = res.payloads.data;
+    this.source.histories.connect().next(this.data.histories);
   }
 
   roomSelect(data) {
@@ -126,7 +139,8 @@ export class OperatorComponent implements OnInit {
     this.data.room.name = data.active_session_id ? data.name : '';
     this.data.room.session = data.active_session_id;
     if (this.data.room.session) {
-      this.roomService.getPlaylist(this.data.room.session).subscribe(res => this.roomPlaylist(res), error => console.log(error));
+      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomPlaylist(res), error => console.log(error));
+      this.roomService.getPlaylist(this.data.room.session, 1).subscribe(res => this.roomHistoryPlaylist(res), error => console.log(error));
       this.presenceChannel(this.data.room.session);
     } else {
       this.data.playlists = [];
@@ -136,7 +150,6 @@ export class OperatorComponent implements OnInit {
   }
 
   callSelect(data) {
-    // console.log(data);
     this.data.call.id = data.room_id;
     this.data.call.from = data.call_type;
     this.roomService.postCall(this.data.call).subscribe(res => console.log(res), error => console.log(error));
@@ -147,22 +160,52 @@ export class OperatorComponent implements OnInit {
     this.video.url = this.video.server + data.file_path;
   }
 
-  videoMetadata(event) {
-    console.log('metadata: ', event);
-    console.log('duration: ', event.srcElement.duration);
-    // const duration = 1000;
-    const duration = event.srcElement.duration / 1000;
-    console.log(duration);
-    setTimeout (() => {
-      console.log('Hello from setTimeout');
-    }, duration * 1000);
+  videoPlay() {
+    if (this.data.room.session) {
+      this.data.room.play = true;
+      this.videoSelect(this.data.playlists[0]);
+      this.video.autoplay = true;
+    }
+  }
+
+  videoStop() {
+    this.videoPlayer.nativeElement.pause();
+    this.videoPlayer.nativeElement.currentTime = 0;
+  }
+
+  videoNext() {
+    this.data.room.play = true;
+    const array = this.data.playlists;
+    const value = this.data.playlists[0];
+    const positionChange = this.data.playlists.length - 1;
+    const result = this.roomPlaylistPositionChange(array, value, positionChange);
+    this.roomPostPlaylist(result);
   }
 
   roomClearSelect(data) {
+    this.video.url = '';
+    this.video.autoplay = false;
     this.data.room.selected = [];
     data.forEach((v, k) => {
       this.data.room.selected[k] = this.selected;
     });
+  }
+
+  roomPlaylistPositionChange(array, value, positionChange) {
+    const oldIndex = array.indexOf(value);
+    if (oldIndex > -1) {
+      let newIndex = (oldIndex + positionChange);
+      if (newIndex < 0) {
+        newIndex = 0;
+      } else if (newIndex >= array.length) {
+        newIndex = array.length;
+      }
+      const arrayClone = array.slice();
+      arrayClone.splice(oldIndex, 1);
+      arrayClone.splice(newIndex, 0, value);
+      return arrayClone;
+    }
+    return array;
   }
 
   playlistDrop(event: CdkDragDrop<string[]>) {
@@ -175,6 +218,7 @@ export class OperatorComponent implements OnInit {
 
   addSongToPlaylist(data) {
     if (this.data.room.session) {
+      this.data.room.play = false;
       const allow = this.source.playlists.data.filter((v, k) => v.id === data.id);
       if (allow.length) { return; }
       this.data.playlists.push(data);
@@ -203,7 +247,7 @@ export class OperatorComponent implements OnInit {
   }
 
   deleteSongFromPlaylist(index) {
-    this.source.playlists.data = this.source.playlists.data.filter((v, k) => k !== index);
+    this.source.playlists.data = this.data.playlists.filter((v, k) => k !== index);
     this.data.playlists = this.source.playlists.data;
     this.roomPostPlaylist(this.data.playlists);
   }
@@ -221,7 +265,11 @@ export class OperatorComponent implements OnInit {
 
   presenceChannel(sessionId) {
     window.Echo.join(`room-playlist.${sessionId}`).listen('RoomPlaylist', (rooms) => {
-      this.roomService.getPlaylist(this.data.room.session).subscribe(res => this.roomRefreshPlaylist(res), error => console.log(error));
+      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomRefreshPlaylist(res), error => console.log(error));
+      this.roomService.getPlaylist(this.data.room.session, 1).subscribe(
+        res => this.roomRefreshHistoryPlaylist(res),
+        error => console.log(error)
+      );
     });
   }
 

@@ -30,8 +30,9 @@ export class RoomService {
     return this.http.get(this.endPoint + 'data', {params}).pipe(catchError(this.errorHandler));
   }
 
-  getPlaylist(data) {
-    return this.http.get(this.endPoint + 'room-playlist/' + data).pipe(catchError(this.errorHandler));
+  getPlaylist(session, isPlayed) {
+    const params = new  HttpParams().set('is_played', isPlayed);
+    return this.http.get(this.endPoint + 'room-playlist/' + session, {params}).pipe(catchError(this.errorHandler));
   }
 
   getCall() {

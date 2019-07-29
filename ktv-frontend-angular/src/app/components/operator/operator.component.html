@@ -143,7 +143,7 @@
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="column.songs; sticky: true"></tr>
-              <tr mat-row *matRowDef="let row; columns: column.songs;" (click)="videoSelect(row)"></tr>
+              <tr mat-row *matRowDef="let row; columns: column.songs;"></tr>
             </table>
           </div>
           <div class="bg-light">
@@ -166,7 +166,7 @@
               <mat-tab label="Priview Video">
                 <div class="d-flex flex-column h-100">
                   <div class="d-flex flex-row flex-grow-1">
-                    <video class="h-100 w-100" [src]="video.url" (loadedmetadata)="videoMetadata($event)" [autoplay]="video.autoplay" controls disablePictureInPicture
+                    <video #videoPlayer class="h-100 w-100" [src]="video.url" (ended)="videoNext()" [autoplay]="video.autoplay" controls disablePictureInPicture
                       controlsList="nodownload">
                       <source [src]="video.url" type="video/mp4">
                     </video>
@@ -211,18 +211,18 @@
                       </ng-container>
 
                       <tr mat-header-row *matHeaderRowDef="column.playlists; sticky: true"></tr>
-                      <tr mat-row *matRowDef="let row; columns: column.playlists; let i = index;" (click)="videoSelect(row)" cdkDrag
+                      <tr mat-row *matRowDef="let row; columns: column.playlists; let i = index;" cdkDrag
                         [cdkDragData]="[i]"></tr>
                     </table>
                   </div>
                   <div class="d-flex flex-row justify-content-center w-100 bg-white">
                     <div class="p-1">
-                      <button mat-mini-fab>
+                      <button mat-mini-fab (click)="videoPlay()">
                         <mat-icon>play_circle_filled</mat-icon>
                       </button>
                     </div>
                     <div class="p-1">
-                      <button mat-mini-fab color="primary">
+                      <button mat-mini-fab color="primary" (click)="videoStop()">
                         <mat-icon>stop</mat-icon>
                       </button>
                     </div>
@@ -245,7 +245,7 @@
 
                       <ng-container matColumnDef="artist">
                         <th mat-header-cell *matHeaderCellDef> Artist </th>
-                        <td mat-cell *matCellDef="let element"> {{element.artist}} </td>
+                        <td mat-cell *matCellDef="let element"> {{element.artist_label}} </td>
                       </ng-container>
 
                       <tr mat-header-row *matHeaderRowDef="column.histories; sticky: true"></tr>
