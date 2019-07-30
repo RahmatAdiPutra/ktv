@@ -5,6 +5,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SongService } from 'src/app/services/song.service';
 import { PusherService } from 'src/app/services/pusher.service';
 import { RoomService } from 'src/app/services/room.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-operator',
@@ -49,7 +50,7 @@ export class OperatorComponent implements OnInit {
     this.column.rooms = ['name', 'status', 'ip_address'];
     this.column.calls = ['action', 'name', 'guest'];
 
-    this.video.server = 'http://localhost/';
+    this.video.server = environment.hostVideo;
     this.video.url = '';
     this.video.autoplay = false;
 

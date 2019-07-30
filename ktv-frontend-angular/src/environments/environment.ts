@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  hostVideo: 'http://192.168.7.224/',
   production: false,
   pusher: {
     key: '2c5db2342d2bbac9a70b',
