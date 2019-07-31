@@ -166,9 +166,9 @@
               <mat-tab label="Priview Video">
                 <div class="d-flex flex-column h-100">
                   <div class="d-flex flex-row flex-grow-1">
-                    <video #videoPlayer class="h-100 w-100" [src]="video.url" (ended)="videoNext()" [autoplay]="video.autoplay" controls disablePictureInPicture
+                    <video #player class="h-100 w-100" [src]="data.song.url" (ended)="songNext()" [autoplay]="data.song.autoplay" controls disablePictureInPicture
                       controlsList="nodownload">
-                      <source [src]="video.url" type="video/mp4">
+                      <source [src]="data.song.url" type="video/mp4">
                     </video>
                   </div>
                 </div>
@@ -217,12 +217,12 @@
                   </div>
                   <div class="d-flex flex-row justify-content-center w-100 bg-white">
                     <div class="p-1">
-                      <button mat-mini-fab (click)="videoPlay()">
+                      <button mat-mini-fab (click)="songPlay()">
                         <mat-icon>play_circle_filled</mat-icon>
                       </button>
                     </div>
                     <div class="p-1">
-                      <button mat-mini-fab color="primary" (click)="videoStop()">
+                      <button mat-mini-fab color="primary" (click)="songStop()">
                         <mat-icon>stop</mat-icon>
                       </button>
                     </div>

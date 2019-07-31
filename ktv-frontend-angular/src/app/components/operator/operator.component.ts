@@ -1,11 +1,31 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource, MatTable } from '@angular/material/table';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { SongService } from 'src/app/services/song.service';
-import { PusherService } from 'src/app/services/pusher.service';
-import { RoomService } from 'src/app/services/room.service';
-import { environment } from '../../../environments/environment';
+import {
+  Component,
+  OnInit,
+  ViewChild
+} from '@angular/core';
+import {
+  MatPaginator
+} from '@angular/material/paginator';
+import {
+  MatTableDataSource,
+  MatTable
+} from '@angular/material/table';
+import {
+  CdkDragDrop,
+  moveItemInArray
+} from '@angular/cdk/drag-drop';
+import {
+  SongService
+} from 'src/app/services/song.service';
+import {
+  PusherService
+} from 'src/app/services/pusher.service';
+import {
+  RoomService
+} from 'src/app/services/room.service';
+import {
+  environment
+} from '../../../environments/environment';
 
 @Component({
   selector: 'app-operator',
@@ -22,13 +42,12 @@ export class OperatorComponent implements OnInit {
   column: any = {};
   page: any = {};
   form: any = {};
-  video: any = {};
 
   selected = false;
 
   @ViewChild(MatPaginator) songPaginator: MatPaginator;
-  @ViewChild('table') table: MatTable<string[]>;
-  @ViewChild('videoPlayer') videoPlayer;
+  @ViewChild('table') table: MatTable < string[] > ;
+  @ViewChild('player') player;
 
   constructor(
     private pusherService: PusherService,
@@ -37,6 +56,7 @@ export class OperatorComponent implements OnInit {
 
     this.data.playlists = [];
     this.data.histories = [];
+    this.data.song = {};
     this.data.room = {};
     this.data.call = {};
     this.page.song = {};
@@ -50,9 +70,9 @@ export class OperatorComponent implements OnInit {
     this.column.rooms = ['name', 'status', 'ip_address'];
     this.column.calls = ['action', 'name', 'guest'];
 
-    this.video.server = environment.hostVideo;
-    this.video.url = '';
-    this.video.autoplay = false;
+    this.data.song.server = environment.hostVideo;
+    this.data.song.url = '';
+    this.data.song.autoplay = false;
 
     this.pusherService.connect();
     this.privateChannel();
@@ -123,7 +143,7 @@ export class OperatorComponent implements OnInit {
     this.data.playlists = res.payloads.data;
     this.source.playlists.connect().next(this.data.playlists);
     if (this.data.room.play) {
-      this.videoPlay();
+      this.songPlay();
     }
   }
 
@@ -140,8 +160,10 @@ export class OperatorComponent implements OnInit {
     this.data.room.name = data.active_session_id ? data.name : '';
     this.data.room.session = data.active_session_id;
     if (this.data.room.session) {
-      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomPlaylist(res), error => console.log(error));
-      this.roomService.getPlaylist(this.data.room.session, 1).subscribe(res => this.roomHistoryPlaylist(res), error => console.log(error));
+      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomPlaylist(res), error =>
+        console.log(error));
+      this.roomService.getPlaylist(this.data.room.session, 1).subscribe(res => this.roomHistoryPlaylist(res), error =>
+        console.log(error));
       this.presenceChannel(this.data.room.session);
     } else {
       this.data.playlists = [];
@@ -157,24 +179,30 @@ export class OperatorComponent implements OnInit {
     this.roomSelect(this.source.rooms.data.find((v, k) => v.id === data.room_id));
   }
 
-  videoSelect(data) {
-    this.video.url = this.video.server + data.file_path;
-  }
-
-  videoPlay() {
-    if (this.data.room.session) {
-      this.data.room.play = true;
-      this.videoSelect(this.data.playlists[0]);
-      this.video.autoplay = true;
+  songSelect(data) {
+    if (data) {
+      this.data.song.url = this.data.song.server + data.file_path;
+    } else {
+      this.data.song.url = '';
+      console.log('Playlists empty');
     }
   }
 
-  videoStop() {
-    this.videoPlayer.nativeElement.pause();
-    this.videoPlayer.nativeElement.currentTime = 0;
+  songPlay() {
+    if (this.data.room.session) {
+      this.data.room.play = true;
+      this.data.song.autoplay = true;
+      this.songSelect(this.data.playlists[0]);
+    }
   }
 
-  videoNext() {
+  songStop() {
+    this.data.song.url = '';
+    this.player.nativeElement.pause();
+    this.player.nativeElement.currentTime = 0;
+  }
+
+  songNext() {
     this.data.room.play = true;
     const array = this.data.playlists;
     const value = this.data.playlists[0];
@@ -184,8 +212,8 @@ export class OperatorComponent implements OnInit {
   }
 
   roomClearSelect(data) {
-    this.video.url = '';
-    this.video.autoplay = false;
+    this.data.song.url = '';
+    this.data.song.autoplay = false;
     this.data.room.selected = [];
     data.forEach((v, k) => {
       this.data.room.selected[k] = this.selected;
@@ -209,7 +237,7 @@ export class OperatorComponent implements OnInit {
     return array;
   }
 
-  playlistDrop(event: CdkDragDrop<string[]>) {
+  playlistDrop(event: CdkDragDrop < string[] > ) {
     const prevIndex = event.item.data;
     moveItemInArray(this.source.playlists.data, prevIndex, event.currentIndex);
     this.table.renderRows();
@@ -220,8 +248,9 @@ export class OperatorComponent implements OnInit {
   addSongToPlaylist(data) {
     if (this.data.room.session) {
       this.data.room.play = false;
-      const allow = this.source.playlists.data.filter((v, k) => v.id === data.id);
-      if (allow.length) { return; }
+      const playlist = this.source.playlists.data.filter((v, k) => v.id === data.id);
+      const history = this.source.histories.data.filter((v, k) => v.id === data.id);
+      if (playlist.length || history.length) { return; }
       this.data.playlists.push(data);
       this.source.playlists.connect().next(this.data.playlists);
       this.roomPostPlaylist(this.data.playlists);
@@ -234,6 +263,13 @@ export class OperatorComponent implements OnInit {
     this.data.room.playlists = {};
     this.data.room.playlists.room_session_id = this.data.room.session;
     this.data.room.addPlaylists = [];
+    this.playlist(data);
+    this.data.room.playlists.playlist = this.data.room.addPlaylists;
+    this.roomService.postPlaylist(this.data.room.playlists).subscribe(res => console.log(res), error =>
+      console.log(error));
+  }
+
+  playlist(data) {
     data.forEach((v, k) => {
       this.data.room.playlist = {
         song_id: v.id,
@@ -243,8 +279,31 @@ export class OperatorComponent implements OnInit {
       };
       this.data.room.addPlaylists.push(this.data.room.playlist);
     });
-    this.data.room.playlists.playlist = this.data.room.addPlaylists;
-    this.roomService.postPlaylist(this.data.room.playlists).subscribe(res => console.log(res), error => console.log(error));
+  }
+
+  playlistHistory(data) {
+    data.forEach((v, k) => {
+      if (this.data.room.play) {
+        this.data.room.playlist = {
+          song_id: v.id,
+          is_played: (data.length - 1) === k ? 1 : 0,
+          order_num: (data.length - 1) === k ? this.data.histories.length + 1 : k,
+          count_play: 1
+        };
+      } else {
+        this.data.room.playlist = {
+          song_id: v.id,
+          is_played: 0,
+          order_num: k,
+          count_play: 1
+        };
+      }
+      this.data.room.addPlaylists.push(this.data.room.playlist);
+    });
+
+    this.data.histories.forEach((v, k) => {
+      this.data.room.addPlaylists.push(v.pivot);
+    });
   }
 
   deleteSongFromPlaylist(index) {
@@ -266,7 +325,8 @@ export class OperatorComponent implements OnInit {
 
   presenceChannel(sessionId) {
     window.Echo.join(`room-playlist.${sessionId}`).listen('RoomPlaylist', (rooms) => {
-      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomRefreshPlaylist(res), error => console.log(error));
+      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomRefreshPlaylist(res), error =>
+        console.log(error));
       this.roomService.getPlaylist(this.data.room.session, 1).subscribe(
         res => this.roomRefreshHistoryPlaylist(res),
         error => console.log(error)
@@ -280,7 +340,11 @@ export class OperatorComponent implements OnInit {
 
   formSearch() {
     this.form.search.new = this.form.search.new ? 1 : 0;
-    this.songService.getSong(this.form.search).subscribe(res => this.songRefresh(res), error => console.log(error));
+    // tslint:disable-next-line: forin
+    for (const key in this.form.search) {
+      this.param.song[key] = this.form.search[key];
+    }
+    this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
   }
 
   formSearchClear() {
