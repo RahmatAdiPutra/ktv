@@ -1,31 +1,11 @@
-import {
-  Component,
-  OnInit,
-  ViewChild
-} from '@angular/core';
-import {
-  MatPaginator
-} from '@angular/material/paginator';
-import {
-  MatTableDataSource,
-  MatTable
-} from '@angular/material/table';
-import {
-  CdkDragDrop,
-  moveItemInArray
-} from '@angular/cdk/drag-drop';
-import {
-  SongService
-} from 'src/app/services/song.service';
-import {
-  PusherService
-} from 'src/app/services/pusher.service';
-import {
-  RoomService
-} from 'src/app/services/room.service';
-import {
-  environment
-} from '../../../environments/environment';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource, MatTable } from '@angular/material/table';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { SongService } from 'src/app/services/song.service';
+import { PusherService } from 'src/app/services/pusher.service';
+import { RoomService } from 'src/app/services/room.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-operator',
@@ -204,11 +184,10 @@ export class OperatorComponent implements OnInit {
 
   songNext() {
     this.data.room.play = true;
-    const array = this.data.playlists;
-    const value = this.data.playlists[0];
-    const positionChange = this.data.playlists.length - 1;
-    const result = this.roomPlaylistPositionChange(array, value, positionChange);
-    this.roomPostPlaylist(result);
+    const x = this.data.playlists.filter((v, k) => k !== 0);
+    const y = this.data.playlists.filter((v, k) => k === 0);
+    this.data.playlists = x.concat(y);
+    this.roomPostPlaylist(this.data.playlists);
   }
 
   roomClearSelect(data) {
@@ -220,28 +199,11 @@ export class OperatorComponent implements OnInit {
     });
   }
 
-  roomPlaylistPositionChange(array, value, positionChange) {
-    const oldIndex = array.indexOf(value);
-    if (oldIndex > -1) {
-      let newIndex = (oldIndex + positionChange);
-      if (newIndex < 0) {
-        newIndex = 0;
-      } else if (newIndex >= array.length) {
-        newIndex = array.length;
-      }
-      const arrayClone = array.slice();
-      arrayClone.splice(oldIndex, 1);
-      arrayClone.splice(newIndex, 0, value);
-      return arrayClone;
-    }
-    return array;
-  }
-
   playlistDrop(event: CdkDragDrop < string[] > ) {
     const prevIndex = event.item.data;
+    this.data.playlists = this.source.playlists.data;
     moveItemInArray(this.source.playlists.data, prevIndex, event.currentIndex);
     this.table.renderRows();
-    this.data.playlists = this.source.playlists.data;
     this.roomPostPlaylist(this.data.playlists);
   }
 
