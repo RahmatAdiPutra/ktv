@@ -47,7 +47,7 @@ export class OperatorComponent implements OnInit {
     this.column.songs = ['action', 'title', 'artist', 'genre', 'language'];
     this.column.playlists = ['action', 'title', 'artist'];
     this.column.histories = ['title', 'artist'];
-    this.column.rooms = ['name', 'status', 'ip_address'];
+    this.column.rooms = ['name', 'status', 'guest_name', 'ip_address'];
     this.column.calls = ['action', 'name', 'guest'];
 
     this.data.song.server = environment.hostVideo;
@@ -225,7 +225,7 @@ export class OperatorComponent implements OnInit {
     this.data.room.playlists = {};
     this.data.room.playlists.room_session_id = this.data.room.session;
     this.data.room.addPlaylists = [];
-    this.playlist(data);
+    this.playlistHistory(data);
     this.data.room.playlists.playlist = this.data.room.addPlaylists;
     this.roomService.postPlaylist(this.data.room.playlists).subscribe(res => console.log(res), error =>
       console.log(error));
