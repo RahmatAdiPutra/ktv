@@ -86,12 +86,12 @@
           <div class="d-flex flex-row">
             <div class="align-self-center p-1 w-50">
               <mat-form-field class="w-100">
-                <input matInput placeholder="Song" [(ngModel)]="form.search.song" (change)="formSearch()">
+                <input matInput placeholder="Song" [(ngModel)]="form.search.song" (input)="formSearch()">
               </mat-form-field>
             </div>
             <div class="align-self-center p-1 w-50">
               <mat-form-field class="w-100">
-                <input matInput placeholder="Artist" [(ngModel)]="form.search.artist" (change)="formSearch()">
+                <input matInput placeholder="Artist" [(ngModel)]="form.search.artist" (input)="formSearch()">
               </mat-form-field>
             </div>
           </div>
@@ -105,7 +105,7 @@
               </mat-form-field>
             </div>
             <div class="align-self-center p-1 w-50">
-              <mat-checkbox [(ngModel)]="form.search.new" (change)="formSearch()">New Release</mat-checkbox>
+              <mat-checkbox [(ngModel)]="form.search.new" (input)="formSearch()">New Release</mat-checkbox>
             </div>
           </div>
           <div class="d-flex flex-row">
@@ -177,12 +177,10 @@
             <mat-tab-group>
               <mat-tab label="Priview Video">
                 <div class="d-flex flex-column h-100">
-                  <div class="d-flex flex-row flex-grow-1">
-                    <video #player class="h-100 w-100" [src]="data.song.url" (ended)="songNext()" [autoplay]="data.song.autoplay" controls disablePictureInPicture
-                      controlsList="nodownload">
-                      <source [src]="data.song.url" type="video/mp4">
-                    </video>
-                  </div>
+                  <video #player class="h-100 w-100" [src]="data.song.url" (ended)="songNext()" [autoplay]="data.song.autoplay" controls disablePictureInPicture
+                    controlsList="nodownload">
+                    <source [src]="data.song.url" type="video/mp4">
+                  </video>
                 </div>
               </mat-tab>
               <mat-tab label="Customer Info">Customer Info</mat-tab>

@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  endpoint: 'http://localhost/1001/ktv/',
   hostVideo: 'http://192.168.7.224/',
   production: false,
   pusher: {

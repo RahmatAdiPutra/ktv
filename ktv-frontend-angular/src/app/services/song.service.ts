@@ -3,18 +3,19 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Order } from 'src/app/classes/order';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SongService {
 
-  endPoint = 'http://localhost/1001/ktv/';
+  endpoint = environment.endpoint;
 
   constructor(private http: HttpClient) { }
 
   getLanguage() {
-    return this.http.get(this.endPoint + 'master-data/song/language/data').pipe(catchError(this.errorHandler));
+    return this.http.get(this.endpoint + 'master-data/song/language/data').pipe(catchError(this.errorHandler));
   }
 
   getSong(data) {
@@ -31,7 +32,11 @@ export class SongService {
       }
     }
 
-    return this.http.get(this.endPoint + 'transaction-data/song/data', {params}).pipe(catchError(this.errorHandler));
+    return this.http.get(this.endpoint + 'transaction-data/song/data', {params}).pipe(catchError(this.errorHandler));
+  }
+
+  getSearch(data) {
+    // return this.http.get(this.endpoint + 'api/search/data', {params}).pipe(catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {

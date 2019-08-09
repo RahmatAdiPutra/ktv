@@ -36,17 +36,25 @@ export class OperatorComponent implements OnInit {
 
     this.data.playlists = [];
     this.data.histories = [];
+
+    this.data.songs = [];
+    this.data.rooms = [];
+    this.data.calls = [];
+
     this.data.song = {};
     this.data.room = {};
     this.data.call = {};
+
     this.page.song = {};
+
     this.param.song = {};
     this.param.room = {};
+
     this.form.search = {};
 
-    this.column.songs = ['action', 'title', 'artist', 'genre', 'language'];
     this.column.playlists = ['action', 'title', 'artist'];
     this.column.histories = ['title', 'artist'];
+    this.column.songs = ['action', 'title', 'artist', 'genre', 'language'];
     this.column.rooms = ['name', 'status', 'guest_name', 'ip_address'];
     this.column.calls = ['action', 'name', 'guest'];
 
@@ -75,7 +83,8 @@ export class OperatorComponent implements OnInit {
   }
 
   song(res) {
-    this.source.songs = new MatTableDataSource(res.payloads.data);
+    this.data.songs = res.payloads.data;
+    this.source.songs = new MatTableDataSource(this.data.songs);
     this.source.songs.paginator = this.songPaginator;
     this.page.song.pageSizeOptions = [100, 50, 25, 10];
     this.page.song.pageSize = res.payloads.per_page;
@@ -84,12 +93,14 @@ export class OperatorComponent implements OnInit {
   }
 
   room(res) {
-    this.roomClearSelect(res.payloads.data);
-    this.source.rooms = new MatTableDataSource(res.payloads.data);
+    this.data.rooms = res.payloads.data;
+    this.roomClearSelect(this.data.rooms);
+    this.source.rooms = new MatTableDataSource(this.data.rooms);
   }
 
   call(res) {
-    this.source.calls = new MatTableDataSource(res.payloads.data);
+    this.data.calls = res.payloads.data;
+    this.source.calls = new MatTableDataSource(this.data.calls);
   }
 
   songPageEvent(page) {
@@ -99,55 +110,55 @@ export class OperatorComponent implements OnInit {
   }
 
   songRefresh(res) {
-    this.source.songs.connect().next(res.payloads.data);
+    this.data.songs = res.payloads.data;
+    this.source.songs.connect().next(this.data.songs);
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
   }
 
   roomRefresh(res) {
-    this.source.rooms = new MatTableDataSource(res.payloads.data);
-    this.roomSelect(this.source.rooms.data.find((v, k) => v.active_session_id === this.data.room.session));
+    this.data.rooms = res.payloads.data;
+    this.source.rooms = new MatTableDataSource(this.data.rooms);
+    if (this.data.room.session) {
+      this.roomSelect(this.data.rooms.find((v, k) => v.active_session_id === this.data.room.session));
+    }
   }
 
   roomPlaylist(res) {
-    this.data.playlists = res.payloads.data;
+    this.data.playlists = res.payloads.data.filter((v, k) => v.pivot.is_played === 0);
+    this.data.histories = res.payloads.data.filter((v, k) => v.pivot.is_played === 1);
     this.source.playlists = new MatTableDataSource(this.data.playlists);
-  }
-
-  roomHistoryPlaylist(res) {
-    this.data.histories = res.payloads.data;
     this.source.histories = new MatTableDataSource(this.data.histories);
   }
 
   roomRefreshPlaylist(res) {
-    this.data.playlists = res.payloads.data;
+    this.data.playlists = res.payloads.data.filter((v, k) => v.pivot.is_played === 0);
+    this.data.histories = res.payloads.data.filter((v, k) => v.pivot.is_played === 1);
     this.source.playlists.connect().next(this.data.playlists);
+    this.source.histories.connect().next(this.data.histories);
+    this.source.playlists.data = this.data.playlists;
+    this.source.histories.data = this.data.histories;
     if (this.data.room.play) {
       this.songPlay();
     }
   }
 
-  roomRefreshHistoryPlaylist(res) {
-    this.data.histories = res.payloads.data;
-    this.source.histories.connect().next(this.data.histories);
-  }
-
   roomSelect(data) {
-    if (typeof data === 'undefined') { return; }
-    this.roomClearSelect(this.source.rooms.data);
-    const index = this.source.rooms.data.indexOf(data);
+    this.roomClearSelect(this.data.rooms);
+    const index = this.data.rooms.indexOf(data);
     this.data.room.selected[index] = !this.data.room.selected[index];
     this.data.room.name = data.active_session_id ? data.name : '';
     this.data.room.session = data.active_session_id;
+    this.data.room.token = data.token;
     if (this.data.room.session) {
-      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomPlaylist(res), error =>
-        console.log(error));
-      this.roomService.getPlaylist(this.data.room.session, 1).subscribe(res => this.roomHistoryPlaylist(res), error =>
+      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomPlaylist(res), error =>
         console.log(error));
       this.presenceChannel(this.data.room.session);
     } else {
       this.data.playlists = [];
+      this.data.histories = [];
       this.source.playlists = [];
+      this.source.histories = [];
       console.log('Room session not active');
     }
   }
@@ -156,7 +167,7 @@ export class OperatorComponent implements OnInit {
     this.data.call.id = data.room_id;
     this.data.call.from = data.call_type;
     this.roomService.postCall(this.data.call).subscribe(res => console.log(res), error => console.log(error));
-    this.roomSelect(this.source.rooms.data.find((v, k) => v.id === data.room_id));
+    this.roomSelect(this.data.rooms.find((v, k) => v.id === data.room_id));
   }
 
   songSelect(data) {
@@ -186,8 +197,13 @@ export class OperatorComponent implements OnInit {
     this.data.room.play = true;
     const x = this.data.playlists.filter((v, k) => k !== 0);
     const y = this.data.playlists.filter((v, k) => k === 0);
-    this.data.playlists = x.concat(y);
-    this.roomPostPlaylist(this.data.playlists);
+    const z = x.concat(y);
+    this.data.playlists = x;
+    this.source.playlists.connect().next(this.data.playlists);
+    this.source.playlists.data = this.data.playlists;
+    // this.data.playlists = x.concat(y);
+    // this.roomPostPlaylist(this.data.playlists);
+    this.roomPostPlaylist(z);
   }
 
   roomClearSelect(data) {
@@ -204,17 +220,28 @@ export class OperatorComponent implements OnInit {
     this.data.playlists = this.source.playlists.data;
     moveItemInArray(this.source.playlists.data, prevIndex, event.currentIndex);
     this.table.renderRows();
+    if (prevIndex[0] === 0 || event.currentIndex === 0) {
+      this.songStop();
+      this.songPlay();
+    }
+    this.source.playlists.connect().next(this.data.playlists);
+    this.data.room.play = false;
     this.roomPostPlaylist(this.data.playlists);
   }
 
   addSongToPlaylist(data) {
     if (this.data.room.session) {
       this.data.room.play = false;
-      const playlist = this.source.playlists.data.filter((v, k) => v.id === data.id);
-      const history = this.source.histories.data.filter((v, k) => v.id === data.id);
-      if (playlist.length || history.length) { return; }
+      const playlist = this.data.playlists.filter((v, k) => v.id === data.id);
+      const history = this.data.histories.filter((v, k) => v.id === data.id);
+      if (playlist.length) { return; }
+      if (history.length) {
+        this.data.histories = this.data.histories.filter((v, k) => v.id !== data.id);
+        this.source.histories.connect().next(this.data.histories);
+      }
       this.data.playlists.push(data);
       this.source.playlists.connect().next(this.data.playlists);
+      this.source.playlists.data = this.data.playlists;
       this.roomPostPlaylist(this.data.playlists);
     } else {
       console.log('Room session not active');
@@ -249,7 +276,7 @@ export class OperatorComponent implements OnInit {
         this.data.room.playlist = {
           song_id: v.id,
           is_played: (data.length - 1) === k ? 1 : 0,
-          order_num: (data.length - 1) === k ? this.data.histories.length + 1 : k,
+          order_num: (data.length - 1) === k ? this.data.histories.length : k,
           count_play: 1
         };
       } else {
@@ -264,13 +291,20 @@ export class OperatorComponent implements OnInit {
     });
 
     this.data.histories.forEach((v, k) => {
-      this.data.room.addPlaylists.push(v.pivot);
+      this.data.room.history = {
+        song_id: v.id,
+        is_played: 1,
+        order_num: k,
+        count_play: 1
+      };
+      this.data.room.addPlaylists.push(this.data.room.history);
     });
   }
 
   deleteSongFromPlaylist(index) {
-    this.source.playlists.data = this.data.playlists.filter((v, k) => k !== index);
-    this.data.playlists = this.source.playlists.data;
+    this.data.room.play = false;
+    this.data.playlists = this.data.playlists.filter((v, k) => k !== index);
+    this.source.playlists.connect().next(this.data.playlists);
     this.roomPostPlaylist(this.data.playlists);
   }
 
@@ -287,12 +321,9 @@ export class OperatorComponent implements OnInit {
 
   presenceChannel(sessionId) {
     window.Echo.join(`room-playlist.${sessionId}`).listen('RoomPlaylist', (rooms) => {
-      this.roomService.getPlaylist(this.data.room.session, 0).subscribe(res => this.roomRefreshPlaylist(res), error =>
+      this.data.room.play = true;
+      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomRefreshPlaylist(res), error =>
         console.log(error));
-      this.roomService.getPlaylist(this.data.room.session, 1).subscribe(
-        res => this.roomRefreshHistoryPlaylist(res),
-        error => console.log(error)
-      );
     });
   }
 

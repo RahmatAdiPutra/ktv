@@ -3,13 +3,14 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Order } from 'src/app/classes/order';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoomService {
 
-  endPoint = 'http://localhost/1001/ktv/transaction-data/room/';
+  endpoint = environment.endpoint + 'transaction-data/room/';
 
   constructor(private http: HttpClient) { }
 
@@ -27,24 +28,23 @@ export class RoomService {
       }
     }
 
-    return this.http.get(this.endPoint + 'data', {params}).pipe(catchError(this.errorHandler));
+    return this.http.get(this.endpoint + 'data', {params}).pipe(catchError(this.errorHandler));
   }
 
-  getPlaylist(session, isPlayed) {
-    const params = new  HttpParams().set('is_played', isPlayed);
-    return this.http.get(this.endPoint + 'room-playlist/' + session, {params}).pipe(catchError(this.errorHandler));
+  getPlaylist(token) {
+    return this.http.get(this.endpoint + 'room-playlist/' + token).pipe(catchError(this.errorHandler));
   }
 
   getCall() {
-    return this.http.get(this.endPoint + 'room-call').pipe(catchError(this.errorHandler));
+    return this.http.get(this.endpoint + 'room-call').pipe(catchError(this.errorHandler));
   }
 
   postPlaylist(data) {
-    return this.http.post(this.endPoint + 'post-playlist', data).pipe(catchError(this.errorHandler));
+    return this.http.post(this.endpoint + 'post-playlist', data).pipe(catchError(this.errorHandler));
   }
 
   postCall(data) {
-    return this.http.post(this.endPoint + 'post-call', data).pipe(catchError(this.errorHandler));
+    return this.http.post(this.endpoint + 'post-call', data).pipe(catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {
