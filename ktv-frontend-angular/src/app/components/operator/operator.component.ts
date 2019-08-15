@@ -36,7 +36,6 @@ export class OperatorComponent implements OnInit {
 
     this.data.playlists = [];
     this.data.histories = [];
-
     this.data.songs = [];
     this.data.rooms = [];
     this.data.calls = [];
@@ -44,16 +43,18 @@ export class OperatorComponent implements OnInit {
     this.data.song = {};
     this.data.room = {};
     this.data.call = {};
+    this.data.search = {};
 
     this.page.song = {};
 
     this.param.song = {};
     this.param.room = {};
+    this.param.search = {};
 
     this.form.search = {};
 
     this.column.playlists = ['action', 'title', 'artist'];
-    this.column.histories = ['title', 'artist'];
+    this.column.histories = ['action', 'title', 'artist'];
     this.column.songs = ['action', 'title', 'artist', 'genre', 'language'];
     this.column.rooms = ['name', 'status', 'guest_name', 'ip_address'];
     this.column.calls = ['action', 'name', 'guest'];
@@ -104,14 +105,31 @@ export class OperatorComponent implements OnInit {
   }
 
   songPageEvent(page) {
-    this.param.song.start = page.pageSize * page.pageIndex;
-    this.param.song.length = page.pageSize;
-    this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
+    if (this.form.search.song) {
+      this.param.search.page = page.pageIndex + 1;
+      this.songService.getSearch(this.param.search).subscribe(res => this.songSearch(res), error => console.log(error));
+    } else {
+      this.param.song.start = page.pageSize * page.pageIndex;
+      this.param.song.length = page.pageSize;
+      this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
+    }
+  }
+
+  songSearch(res) {
+    const data = {
+      payloads: res.payloads.results.song
+    };
+    this.songRefresh(data);
   }
 
   songRefresh(res) {
     this.data.songs = res.payloads.data;
-    this.source.songs.connect().next(this.data.songs);
+    this.source.songs = new MatTableDataSource(this.data.songs);
+    if (this.form.search.song) {
+      this.page.song.pageSizeOptions = [10];
+    } else {
+      this.page.song.pageSizeOptions = [100, 50, 25, 10];
+    }
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
   }
@@ -138,9 +156,6 @@ export class OperatorComponent implements OnInit {
     this.source.histories.connect().next(this.data.histories);
     this.source.playlists.data = this.data.playlists;
     this.source.histories.data = this.data.histories;
-    if (this.data.room.play) {
-      this.songPlay();
-    }
   }
 
   roomSelect(data) {
@@ -151,8 +166,7 @@ export class OperatorComponent implements OnInit {
     this.data.room.session = data.active_session_id;
     this.data.room.token = data.token;
     if (this.data.room.session) {
-      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomPlaylist(res), error =>
-        console.log(error));
+      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomPlaylist(res), error => console.log(error));
       this.presenceChannel(this.data.room.session);
     } else {
       this.data.playlists = [];
@@ -203,6 +217,7 @@ export class OperatorComponent implements OnInit {
     this.source.playlists.data = this.data.playlists;
     // this.data.playlists = x.concat(y);
     // this.roomPostPlaylist(this.data.playlists);
+    this.songPlay();
     this.roomPostPlaylist(z);
   }
 
@@ -222,9 +237,9 @@ export class OperatorComponent implements OnInit {
     this.table.renderRows();
     if (prevIndex[0] === 0 || event.currentIndex === 0) {
       this.songStop();
-      this.songPlay();
     }
     this.source.playlists.connect().next(this.data.playlists);
+    this.source.playlists.data = this.data.playlists;
     this.data.room.play = false;
     this.roomPostPlaylist(this.data.playlists);
   }
@@ -238,6 +253,7 @@ export class OperatorComponent implements OnInit {
       if (history.length) {
         this.data.histories = this.data.histories.filter((v, k) => v.id !== data.id);
         this.source.histories.connect().next(this.data.histories);
+        this.source.histories.data = this.data.histories;
       }
       this.data.playlists.push(data);
       this.source.playlists.connect().next(this.data.playlists);
@@ -254,8 +270,7 @@ export class OperatorComponent implements OnInit {
     this.data.room.addPlaylists = [];
     this.playlistHistory(data);
     this.data.room.playlists.playlist = this.data.room.addPlaylists;
-    this.roomService.postPlaylist(this.data.room.playlists).subscribe(res => console.log(res), error =>
-      console.log(error));
+    this.roomService.postPlaylist(this.data.room.playlists).subscribe(res => console.log(res), error => console.log(error));
   }
 
   playlist(data) {
@@ -305,6 +320,10 @@ export class OperatorComponent implements OnInit {
     this.data.room.play = false;
     this.data.playlists = this.data.playlists.filter((v, k) => k !== index);
     this.source.playlists.connect().next(this.data.playlists);
+    this.source.playlists.data = this.data.playlists;
+    if (index === 0) {
+      this.songStop();
+    }
     this.roomPostPlaylist(this.data.playlists);
   }
 
@@ -321,9 +340,7 @@ export class OperatorComponent implements OnInit {
 
   presenceChannel(sessionId) {
     window.Echo.join(`room-playlist.${sessionId}`).listen('RoomPlaylist', (rooms) => {
-      this.data.room.play = true;
-      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomRefreshPlaylist(res), error =>
-        console.log(error));
+      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomRefreshPlaylist(res), error => console.log(error));
     });
   }
 
@@ -332,15 +349,51 @@ export class OperatorComponent implements OnInit {
   }
 
   formSearch() {
-    this.form.search.new = this.form.search.new ? 1 : 0;
-    // tslint:disable-next-line: forin
-    for (const key in this.form.search) {
-      this.param.song[key] = this.form.search[key];
+    this.songPaginator.pageIndex = 0;
+    this.param.song.start = 0;
+    if (this.form.search.song) {
+      delete this.param.search.page;
+      this.data.search.q = this.form.search.song;
+
+      if (this.form.search.artist) {
+        this.data.search.artist = this.form.search.artist;
+      } else {
+        delete this.data.search.artist;
+        delete this.param.search.artist;
+      }
+
+      if (this.form.search.language) {
+        this.data.search.lang =  this.form.search.language;
+      } else {
+        delete this.data.search.lang;
+        delete this.param.search.lang;
+      }
+
+      // tslint:disable-next-line: forin
+      for (const key in this.data.search) {
+        this.param.search[key] = this.data.search[key];
+      }
+
+      this.songService.getSearch(this.param.search).subscribe(res => this.songSearch(res), error => console.log(error));
+    } else {
+      this.form.search.new = this.form.search.new ? 1 : 0;
+
+      // tslint:disable-next-line: forin
+      for (const key in this.form.search) {
+        this.param.song[key] = this.form.search[key];
+      }
+
+      this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
     }
-    this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
   }
 
   formSearchClear() {
+    delete this.param.song.song;
+    delete this.param.song.artist;
+    delete this.param.song.language;
+    delete this.param.song.new;
+    this.songPaginator.pageIndex = 0;
+    this.param.song.start = 0;
     this.form.search.song = '';
     this.form.search.artist = '';
     this.form.search.language = '';

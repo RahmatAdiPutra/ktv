@@ -36,7 +36,14 @@ export class SongService {
   }
 
   getSearch(data) {
-    // return this.http.get(this.endpoint + 'api/search/data', {params}).pipe(catchError(this.errorHandler));
+    let params = new HttpParams();
+
+    // tslint:disable-next-line: forin
+    for (const key in data) {
+      params = params.append(key, data[key]);
+    }
+
+    return this.http.get(this.endpoint + 'api/search', {params}).pipe(catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {
