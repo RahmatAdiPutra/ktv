@@ -1,5 +1,9 @@
-<div class="d-flex flex-row vh-100">
-  <video #player class="h-100 w-100" src="" controls>
-    <source src="" type="video/mp4">
+<div class="d-flex flex-row vh-100" *ngIf="data.player.active; else notActive">
+  <video #player class="h-100 w-100" [src]="data.song.url" (ended)="songNext()" [autoplay]="data.song.autoplay" controls disablePictureInPicture
+  controlsList="nodownload">
+    <source [src]="data.song.url" type="video/mp4">
   </video>
 </div>
+<ng-template #notActive>
+  <h3>Token not available</h3>
+</ng-template>

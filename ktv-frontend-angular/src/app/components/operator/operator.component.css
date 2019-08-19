@@ -215,6 +215,8 @@ video::-webkit-media-controls-fullscreen-button { display: none; }
 
 .room .mat-row { cursor: pointer; }
 
+.song .mat-row { cursor: pointer; }
+
 .badge- {
     color: white;
 }

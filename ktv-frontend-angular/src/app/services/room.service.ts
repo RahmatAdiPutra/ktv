@@ -31,6 +31,10 @@ export class RoomService {
     return this.http.get(this.endpoint + 'data', {params}).pipe(catchError(this.errorHandler));
   }
 
+  getRoomOpen(token) {
+    return this.http.get(this.endpoint + 'room-open/' + token).pipe(catchError(this.errorHandler));
+  }
+
   getPlaylist(token) {
     return this.http.get(this.endpoint + 'room-playlist/' + token).pipe(catchError(this.errorHandler));
   }

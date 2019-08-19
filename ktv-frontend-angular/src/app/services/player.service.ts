@@ -19,6 +19,10 @@ export class PlayerService {
     return this.http.get(this.endpoint + 'api/room-session/3XMG9T3AZUEY', {headers}).pipe(catchError(this.errorHandler));
   }
 
+  player(data) {
+    return this.http.post(this.endpoint + 'transaction-data/room/room-player', data).pipe(catchError(this.errorHandler));
+  }
+
   errorHandler(error: HttpErrorResponse) {
     return throwError(error.message || 'Server error');
   }

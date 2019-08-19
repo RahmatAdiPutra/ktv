@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'ktv', component: KtvComponent },
-  { path: 'player', component: PlayerComponent },
+  { path: 'player/:token', component: PlayerComponent },
   { path: 'remote', component: RemoteComponent },
   { path: 'operator', component: OperatorComponent },
   { path: '**', component: PageNotFoundComponent },
