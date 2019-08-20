@@ -36,8 +36,6 @@ export class PlayerComponent implements OnInit {
       this.data.song.server = environment.hostVideo;
       this.data.song.url = '';
       this.data.song.autoplay = false;
-
-      this.pusherService.connect();
     }
 
   ngOnInit() {

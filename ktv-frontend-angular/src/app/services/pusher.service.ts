@@ -11,9 +11,7 @@ declare global {
 })
 export class PusherService {
 
-  constructor() {}
-
-  connect() {
+  constructor() {
     window.Echo = new Echo({
       broadcaster: environment.pusher.broadcaster,
       authEndpoint : environment.pusher.authEndpoint,

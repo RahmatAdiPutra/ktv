@@ -64,7 +64,6 @@ export class OperatorComponent implements OnInit {
     this.data.song.server = environment.hostVideo;
     this.data.song.url = '';
 
-    this.pusherService.connect();
     this.privateChannel();
   }
 
