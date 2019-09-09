@@ -10,11 +10,11 @@ import { OperatorComponent } from "./components/operator/operator.component";
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent },
+  { path: 'dashboard', component: HomeComponent },
   { path: 'ktv', component: KtvComponent },
   { path: 'player/:token', component: PlayerComponent },
   { path: 'remote', component: RemoteComponent },
-  { path: 'operator', component: OperatorComponent },
+  { path: 'home', component: OperatorComponent },
   { path: '**', component: PageNotFoundComponent },
 ];
 
