@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port=4201 --live-reload -o",
-    "build": "ng build",
+    "build": "ng build --prod --output-path dist --baseHref=/operator/ --deleteOutputPath=true && rm -rf ../../../../../operator && cp -r dist ../../../../../operator && rm -rf dist && cp ../../../../../ktv/src/ng.htaccess ../../../../../operator/.htaccess",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
