@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  endpoint: 'http://localhost/1001/ktv/',
   apiUrl: '/ktv/server',
   pusher: {
     httpHost: window.location.hostname,
