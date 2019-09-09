@@ -14,15 +14,15 @@ export class PusherService {
 
   constructor(private router: Router) {
     window.Echo = new Echo({
-      broadcaster: environment.pusher.broadcaster,
-      authEndpoint : environment.pusher.authEndpoint,
+      broadcaster: 'pusher',
+      authEndpoint: environment.pusher.authEndpoint,
       key: environment.pusher.key,
       httpHost: environment.pusher.httpHost,
-      cluster: environment.pusher.cluster,
-      encrypted: environment.pusher.encrypted,
-      disableStats: environment.pusher.disableStats,
+      cluster: 'ap1',
+      encrypted: false,
+      disableStats: true,
       wsHost: environment.pusher.wsHost,
-      wsPort: environment.pusher.wsPort
+      wsPort: 6001
     });
 
     window.Echo.connector.pusher.connection.bind('state_change', (states: any) => {

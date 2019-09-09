@@ -109,10 +109,10 @@
           </div>
           <div class="d-flex flex-row">
             <div class="align-self-center p-1">
-              <button mat-raised-button color="primary" (click)="formSearchClear()">Clear</button>
+              <button mat-raised-button color="primary" (click)="formSearch()">Search</button>
             </div>
             <div class="align-self-center p-1">
-              <button mat-raised-button color="primary" (click)="formSearch()">Search</button>
+              <button mat-raised-button color="primary" (click)="formSearchClear()">Clear</button>
             </div>
           </div>
         </div>
@@ -202,18 +202,34 @@
                       [cdkDropListData]="source.playlists" (cdkDropListDropped)="playlistDrop($event)">
                       <ng-container matColumnDef="title">
                         <th mat-header-cell *matHeaderCellDef> Title </th>
-                        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+                        <td mat-cell *matCellDef="let element; let row" (click)="songPlaylistSelect(row)"> {{element.song.title}} </td>
                       </ng-container>
 
                       <ng-container matColumnDef="artist">
                         <th mat-header-cell *matHeaderCellDef> Artist </th>
-                        <td mat-cell *matCellDef="let element"> {{element.artist_label}} </td>
+                        <td mat-cell *matCellDef="let element; let row" (click)="songPlaylistSelect(row)"> {{element.song.artist_label}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="is_play">
+                        <th mat-header-cell *matHeaderCellDef width="50"></th>
+                        <td mat-cell *matCellDef="let element; let row" (click)="songPlaylistSelect(row)">
+                          <div *ngIf="element.now_playing">
+                            <mat-icon *ngIf="data.player.playing === 'playing'; else pause">play_arrow</mat-icon>
+                            <ng-template #pause>
+                                <mat-icon>pause</mat-icon>
+                            </ng-template>
+                          </div>
+                        </td>
                       </ng-container>
 
                       <ng-container matColumnDef="action">
-                        <th mat-header-cell *matHeaderCellDef width="50"> </th>
+                        <th mat-header-cell *matHeaderCellDef width="50"> 
+                          <button mat-icon-button (click)="deleteAllSongFromPlaylist()">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </th>
                         <td mat-cell *matCellDef="let element; let i = index;">
-                          <button mat-icon-button color="warn" (click)="deleteSongFromPlaylist(i)">
+                          <button mat-icon-button color="warn" (click)="deleteSongFromPlaylist(element)">
                             <mat-icon>delete_forever</mat-icon>
                           </button>
                         </td>
@@ -221,54 +237,18 @@
 
                       <tr mat-header-row *matHeaderRowDef="column.playlists; sticky: true"></tr>
                       <tr mat-row *matRowDef="let row; columns: column.playlists; let i = index;" cdkDrag
-                        [cdkDragData]="[i]"></tr>
+                        [cdkDragData]="[i]" [ngClass]="row.now_playing ? 'selected' : ''"></tr>
                     </table>
                   </div>
                   <div class="d-flex flex-row justify-content-center w-100 bg-white">
                     <div class="p-1">
-                      <button mat-mini-fab (click)="songPlay()">
-                        <mat-icon>play_arrow</mat-icon>
+                      <button mat-mini-fab color="primary" (click)="playToggle()">
+                        <mat-icon *ngIf="data.player.playing === 'playing'; else pause">pause</mat-icon>
+                        <ng-template #pause>
+                            <mat-icon>play_arrow</mat-icon>
+                        </ng-template>
                       </button>
                     </div>
-                    <div class="p-1">
-                      <button mat-mini-fab color="primary" (click)="songStop()">
-                        <mat-icon>stop</mat-icon>
-                      </button>
-                    </div>
-                    <div class="p-1">
-                      <button mat-mini-fab color="warn" (click)="songRepeat()">
-                        <mat-icon>repeat</mat-icon>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </mat-tab>
-              <mat-tab label="History {{ data.room.name }}">
-                <div class="d-flex flex-column h-100">
-                  <div class="overflow-auto flex-grow-1 vh-100">
-                    <table mat-table [dataSource]="source.histories" class="w-100">
-                      <ng-container matColumnDef="title">
-                        <th mat-header-cell *matHeaderCellDef> Title </th>
-                        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="artist">
-                        <th mat-header-cell *matHeaderCellDef> Artist </th>
-                        <td mat-cell *matCellDef="let element"> {{element.artist_label}} </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="action">
-                        <th mat-header-cell *matHeaderCellDef> Add </th>
-                        <td mat-cell *matCellDef="let element; let row">
-                          <button mat-icon-button color="primary" (click)="addSongToPlaylist(row)">
-                            <mat-icon>add</mat-icon>
-                          </button>
-                        </td>
-                      </ng-container>
-
-                      <tr mat-header-row *matHeaderRowDef="column.histories; sticky: true"></tr>
-                      <tr mat-row *matRowDef="let row; columns: column.histories;"></tr>
-                    </table>
                   </div>
                 </div>
               </mat-tab>

@@ -21,6 +21,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { OperatorComponent } from './components/operator/operator.component';
 import { HomeComponent } from './components/home/home.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
+import { DialogDeleteComponent } from './components/dialog-delete/dialog-delete.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,11 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
     RemoteComponent,
     PageNotFoundComponent,
     OperatorComponent,
-    HomeComponent
+    HomeComponent,
+    DialogDeleteComponent
+  ],
+  entryComponents: [
+    DialogDeleteComponent
   ],
   imports: [
     BrowserModule,

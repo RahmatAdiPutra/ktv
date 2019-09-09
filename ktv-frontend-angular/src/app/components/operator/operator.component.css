@@ -217,6 +217,12 @@ video::-webkit-media-controls-fullscreen-button { display: none; }
 
 .song .mat-row { cursor: pointer; }
 
+.mat-raised-button {
+    -webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+
 .badge- {
     color: white;
 }

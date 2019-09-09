@@ -4,9 +4,10 @@ import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { environment } from '../../../environments/environment';
 import { PusherService } from 'src/app/services/pusher.service';
+import { OperatorService } from 'src/app/services/operator.service';
 import { SongService } from 'src/app/services/song.service';
-import { RoomService } from 'src/app/services/room.service';
-import { PlayerService } from 'src/app/services/player.service';
+import { MatDialog } from '@angular/material';
+import { DialogDeleteComponent } from '../dialog-delete/dialog-delete.component';
 
 @Component({
   selector: 'app-operator',
@@ -31,12 +32,10 @@ export class OperatorComponent implements OnInit {
   @ViewChild('player') player;
 
   constructor(
+    public dialog: MatDialog,
     private pusherService: PusherService,
-    private songService: SongService,
-    private roomService: RoomService,
-    private playerService: PlayerService) {
-    this.data.playlists = [];
-    this.data.histories = [];
+    private operator: OperatorService,
+    private songService: SongService) {
     this.data.songs = [];
     this.data.rooms = [];
     this.data.calls = [];
@@ -55,8 +54,7 @@ export class OperatorComponent implements OnInit {
 
     this.form.search = {};
 
-    this.column.playlists = ['action', 'title', 'artist'];
-    this.column.histories = ['action', 'title', 'artist'];
+    this.column.playlists = ['action', 'title', 'artist', 'is_play'];
     this.column.songs = ['action', 'title', 'artist', 'genre', 'language'];
     this.column.rooms = ['name', 'status', 'guest_name', 'ip_address'];
     this.column.calls = ['action', 'name', 'guest'];
@@ -64,38 +62,40 @@ export class OperatorComponent implements OnInit {
     this.data.song.server = environment.hostVideo;
     this.data.song.url = '';
 
-    this.privateChannel();
+    this.channelRoomCall();
   }
 
   ngOnInit() {
-    this.param.song.length = 25;
-    this.param.song.orderColumn = '3';
-    this.param.song.orderDir = 'desc';
-    this.param.room.orderColumn = '2';
-    this.param.room.orderDir = 'asc';
-    this.songService.getLanguage().subscribe(res => this.language(res), error => console.log(error));
-    this.songService.getSong(this.param.song).subscribe(res => this.song(res), error => console.log(error));
-    this.roomService.getRoom(this.param.room).subscribe(res => this.room(res), error => console.log(error));
-    this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
+    // this.param.song.length = 25;
+    // this.param.song.orderColumn = '3';
+    // this.param.song.orderDir = 'desc';
+    // this.param.room.orderColumn = '2';
+    // this.param.room.orderDir = 'asc';
+    this.operator.song().subscribe(res => this.song(res), error => console.log(error));
+    this.operator.language().subscribe(res => this.language(res), error => console.log(error));
+    this.operator.room().subscribe(res => this.room(res), error => console.log(error));
+    this.operator.call().subscribe(res => this.call(res), error => console.log(error));
   }
 
   language(res) {
-    this.select.languages = res.payloads.data;
+    this.select.languages = res.payloads;
   }
 
   song(res) {
     this.data.songs = res.payloads.data;
     this.source.songs = new MatTableDataSource(this.data.songs);
     this.source.songs.paginator = this.songPaginator;
-    this.page.song.pageSizeOptions = [100, 50, 25, 10];
+    // this.page.song.pageSizeOptions = [100, 50, 25, 10];
+    // this.page.song.pageSizeOptions = [res.payloads.per_page];
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
+    this.page.song.current_page = res.payloads.current_page;
     this.songPaginator._intl.itemsPerPageLabel = 'Song per page';
   }
 
   room(res) {
     this.data.rooms = res.payloads.data;
-    this.roomClearSelect(this.data.rooms);
+    this.roomSelectClear(this.data.rooms);
     this.source.rooms = new MatTableDataSource(this.data.rooms);
   }
 
@@ -106,12 +106,12 @@ export class OperatorComponent implements OnInit {
 
   songPageEvent(page) {
     if (this.form.search.song) {
-      this.param.search.page = page.pageIndex + 1;
-      this.songService.getSearch(this.param.search).subscribe(res => this.songSearch(res), error => console.log(error));
+      // this.param.search.page = page.pageIndex + 1;
+      // this.songService.getSearch(this.param.search).subscribe(res => this.songSearch(res), error => console.log(error));
     } else {
-      this.param.song.start = page.pageSize * page.pageIndex;
-      this.param.song.length = page.pageSize;
-      this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
+      // this.param.song.start = page.pageSize * page.pageIndex;
+      // this.param.song.length = page.pageSize;
+      this.operator.song(page.pageIndex + 1).subscribe(res => this.songRefresh(res), error => console.log(error));
     }
   }
 
@@ -126,12 +126,26 @@ export class OperatorComponent implements OnInit {
     this.data.songs = res.payloads.data;
     this.source.songs = new MatTableDataSource(this.data.songs);
     if (this.form.search.song) {
-      this.page.song.pageSizeOptions = [10];
+      // this.page.song.pageSizeOptions = [10];
     } else {
-      this.page.song.pageSizeOptions = [100, 50, 25, 10];
+      // this.page.song.pageSizeOptions = [100, 50, 25, 10];
     }
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
+  }
+
+  formSearch() {
+    console.log(this.form.search);
+    if (this.form.search.song) {
+      // this.operator.search(this.form.search.song, this.form.search.language).subscribe(
+      //   res => console.log(res),
+      //   error => console.log(error)
+      // );
+      this.operator.search(this.form.search.song, this.form.search.language).subscribe(
+        res => this.songSearch(res),
+        error => console.log(error)
+      );
+    }
   }
 
   roomRefresh(res) {
@@ -143,44 +157,28 @@ export class OperatorComponent implements OnInit {
   }
 
   roomPlaylist(res) {
-    this.data.playlists = res.payloads.data.filter((v, k) => v.pivot.is_played === 0);
-    this.data.histories = res.payloads.data.filter((v, k) => v.pivot.is_played === 1);
-    this.source.playlists = new MatTableDataSource(this.data.playlists);
-    this.source.histories = new MatTableDataSource(this.data.histories);
-  }
-
-  roomRefreshPlaylist(res) {
-    this.data.playlists = res.payloads.data.filter((v, k) => v.pivot.is_played === 0);
-    this.data.histories = res.payloads.data.filter((v, k) => v.pivot.is_played === 1);
-    this.source.playlists.connect().next(this.data.playlists);
-    this.source.histories.connect().next(this.data.histories);
-    this.source.playlists.data = this.data.playlists;
-    this.source.histories.data = this.data.histories;
+    this.data.player.playing = res.payloads.room.player.playing;
+    this.source.playlists = new MatTableDataSource(res.payloads.room.playlist);
   }
 
   roomSelect(data) {
-    this.roomClearSelect(this.data.rooms);
+    this.roomSelectClear(this.data.rooms);
     const index = this.data.rooms.indexOf(data);
     this.data.room.selected[index] = !this.data.room.selected[index];
     this.data.room.name = data.active_session_id ? data.name : '';
     this.data.room.session = data.active_session_id;
     this.data.room.token = data.token;
+    this.data.room.key = data.activation_key;
     if (this.data.room.session) {
-      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomPlaylist(res), error => console.log(error));
-      this.presenceChannel(this.data.room.session);
+      this.operator.playlist(this.data.room.key).subscribe(res => this.roomPlaylist(res), error => console.log(error));
+      this.channelRoomPlaylist(this.data.room);
     } else {
-      this.data.playlists = [];
-      this.data.histories = [];
-      this.source.playlists = [];
-      this.source.histories = [];
       console.log('Room session not active');
     }
   }
 
   callSelect(data) {
-    this.data.call.id = data.room_id;
-    this.data.call.from = data.call_type;
-    this.roomService.postCall(this.data.call).subscribe(res => console.log(res), error => console.log(error));
+    this.operator.callRespond(data.room.activation_key).subscribe(res => console.log(res), error => console.log(error));
     this.roomSelect(this.data.rooms.find((v, k) => v.id === data.room_id));
   }
 
@@ -193,32 +191,24 @@ export class OperatorComponent implements OnInit {
     }
   }
 
-  songPlay() {
+  songPlaylistSelect(data) {
     if (this.data.room.session) {
-      this.data.player.token = this.data.room.token;
-      this.data.player.play = true;
-      this.playerService.player(this.data.player).subscribe(res => console.log(res), error => console.log(error));
+      this.data.room.songId = data.id;
+      this.operator.playing(this.data.room).subscribe(res => console.log(res), error => console.log(error));
     }
   }
 
-  songStop() {
+  playToggle() {
     if (this.data.room.session) {
-      this.data.player.token = this.data.room.token;
-      this.data.player.play = false;
-      this.playerService.player(this.data.player).subscribe(res => console.log(res), error => console.log(error));
+      this.operator.playToggle(this.data.room.key).subscribe(res => console.log(res), error => console.log(error));
     }
   }
 
-  songRepeat() {
-    if (this.data.room.session) {
-      this.data.player.token = this.data.room.token;
-      this.data.player.repeat = this.data.player.repeat ? false : true;
-      this.playerService.player(this.data.player).subscribe(res => console.log(res), error => console.log(error));
-    }
-  }
-
-  roomClearSelect(data) {
+  roomSelectClear(data) {
     this.data.song.url = '';
+    this.data.room = {};
+    this.data.player = {};
+    this.source.playlists = [];
     this.data.room.selected = [];
     data.forEach((v, k) => {
       this.data.room.selected[k] = this.selected;
@@ -226,112 +216,89 @@ export class OperatorComponent implements OnInit {
   }
 
   playlistDrop(event: CdkDragDrop < string[] > ) {
+    // table
     const prevIndex = event.item.data;
-    this.data.playlists = this.source.playlists.data;
     moveItemInArray(this.source.playlists.data, prevIndex, event.currentIndex);
     this.table.renderRows();
-    if (prevIndex[0] === 0 || event.currentIndex === 0) {
-      this.songStop();
-    }
-    this.source.playlists.connect().next(this.data.playlists);
-    this.source.playlists.data = this.data.playlists;
-    this.data.room.play = false;
-    this.roomPostPlaylist(this.data.playlists);
+
+    // post to server
+    this.data.room.dataList = [];
+    this.source.playlists.data.forEach((v) => {
+      this.data.room.dataList.push(v.id);
+    });
+    this.operator.playlistSongReorder(this.data.room).subscribe(res => console.log(res), error => console.log(error));
   }
 
   addSongToPlaylist(data) {
     if (this.data.room.session) {
-      this.data.room.play = false;
-      const playlist = this.data.playlists.filter((v, k) => v.id === data.id);
-      const history = this.data.histories.filter((v, k) => v.id === data.id);
-      if (playlist.length) { return; }
-      if (history.length) {
-        this.data.histories = this.data.histories.filter((v, k) => v.id !== data.id);
-        this.source.histories.connect().next(this.data.histories);
-        this.source.histories.data = this.data.histories;
-      }
-      this.data.playlists.push(data);
-      this.source.playlists.connect().next(this.data.playlists);
-      this.source.playlists.data = this.data.playlists;
-      this.roomPostPlaylist(this.data.playlists);
+      this.data.room.songId = data.id;
+      this.operator.playlistSongAdd(this.data.room).subscribe(res => console.log(res), error => console.log(error));
     } else {
       console.log('Room session not active');
     }
   }
 
-  roomPostPlaylist(data) {
-    this.data.room.playlists = {};
-    this.data.room.playlists.room_session_id = this.data.room.session;
-    this.data.room.addPlaylists = [];
-    this.playlistHistory(data);
-    this.data.room.playlists.playlist = this.data.room.addPlaylists;
-    this.roomService.postPlaylist(this.data.room.playlists).subscribe(res => console.log(res), error => console.log(error));
-  }
-
-  playlistHistory(data) {
-    data.forEach((v, k) => {
-      if (this.data.room.play) {
-        this.data.room.playlist = {
-          song_id: v.id,
-          is_played: (data.length - 1) === k ? 1 : 0,
-          order_num: (data.length - 1) === k ? this.data.histories.length : k,
-          count_play: 1
-        };
-      } else {
-        this.data.room.playlist = {
-          song_id: v.id,
-          is_played: 0,
-          order_num: k,
-          count_play: 1
-        };
-      }
-      this.data.room.addPlaylists.push(this.data.room.playlist);
-    });
-
-    this.data.histories.forEach((v, k) => {
-      this.data.room.history = {
-        song_id: v.id,
-        is_played: 1,
-        order_num: k,
-        count_play: 1
-      };
-      this.data.room.addPlaylists.push(this.data.room.history);
-    });
-  }
-
-  deleteSongFromPlaylist(index) {
-    this.data.room.play = false;
-    this.data.playlists = this.data.playlists.filter((v, k) => k !== index);
-    this.source.playlists.connect().next(this.data.playlists);
-    this.source.playlists.data = this.data.playlists;
-    if (index === 0) {
-      this.songStop();
+  deleteAllSongFromPlaylist() {
+    if (this.data.room.session) {
+        const dialogRef = this.dialog.open(DialogDeleteComponent);
+        dialogRef.afterClosed().subscribe(result => {
+          console.log('The dialog was closed', result);
+          if (result === true) {
+            this.source.playlists.data.forEach((v) => {
+              console.log(v);
+              this.deleteSongFromPlaylist(v);
+            });
+          }
+        });
+    } else {
+      console.log('Room session not active');
     }
-    this.roomPostPlaylist(this.data.playlists);
   }
 
-  privateChannel() {
-    window.Echo.private('room').listen('RoomStatusChanged', rooms => {
-      console.log('event RoomStatusChanged', rooms);
-      this.roomService.getRoom(this.param.room).subscribe(res => this.roomRefresh(res), error => console.log(error));
-    }).listen('Calling', room => {
-      console.log('Calling room', room);
-      if (room.to !== 'operator') { return; }
-      this.roomService.getCall().subscribe(res => this.call(res), error => console.log(error));
-    });
+  deleteSongFromPlaylist(data) {
+    this.data.room.songListId = data.id;
+    this.operator.playlistSongDelete(this.data.room).subscribe(res => console.log(res), error => console.log(error));
   }
 
-  presenceChannel(sessionId) {
-    window.Echo.join(`room-playlist.${sessionId}`).listen('RoomPlaylist', (rooms) => {
-      this.roomService.getPlaylist(this.data.room.token).subscribe(res => this.roomRefreshPlaylist(res), error => console.log(error));
-    });
+  channelRoomCall() {
+    window.Echo.channel(`rooms`)
+      .listen('.respond.operator', message => {
+        console.log('respond rooms', message);
+        this.operator.call().subscribe(res => this.call(res), error => console.log(error));
+      }).listen('.call.operator', message => {
+        console.log('call rooms', message);
+        this.operator.call().subscribe(res => this.call(res), error => console.log(error));
+      });
   }
 
-  leavePresenceChannel(sessionId) {
-    window.Echo.leave(`room-playlist.${sessionId}`);
+  channelRoomPlaylist(data) {
+    // listing playlist change
+    window.Echo.channel(`session.${data.token}`)
+      .listen('.playlist.updated', playlist => {
+        console.log(playlist);
+        this.source.playlists.connect().next(playlist);
+      })
+      .listen('.player.stateUpdated', state => {
+        console.log('player.stateUpdated ' + state.action);
+        this.data.player.playing = state.action;
+      });
   }
 
-  formSearch() {
+  formSearchClear() {
+    delete this.param.song.song;
+    delete this.param.song.artist;
+    delete this.param.song.language;
+    delete this.param.song.new;
+    this.songPaginator.pageIndex = 0;
+    this.param.song.start = 0;
+    this.form.search.song = '';
+    this.form.search.artist = '';
+    this.form.search.language = '';
+    this.form.search.new = 0;
+    this.songService.getSong(this.form.search).subscribe(res => this.songRefresh(res), error => console.log(error));
+  }
+
+  test() {
     this.songPaginator.pageIndex = 0;
     this.param.song.start = 0;
     if (this.form.search.song) {
@@ -368,20 +335,6 @@ export class OperatorComponent implements OnInit {
 
       this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
     }
-  }
-
-  formSearchClear() {
-    delete this.param.song.song;
-    delete this.param.song.artist;
-    delete this.param.song.language;
-    delete this.param.song.new;
-    this.songPaginator.pageIndex = 0;
-    this.param.song.start = 0;
-    this.form.search.song = '';
-    this.form.search.artist = '';
-    this.form.search.language = '';
-    this.form.search.new = 0;
-    this.songService.getSong(this.form.search).subscribe(res => this.songRefresh(res), error => console.log(error));
   }
 
 }

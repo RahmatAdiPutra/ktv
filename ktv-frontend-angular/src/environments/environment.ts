@@ -3,19 +3,16 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  production: false,
   endpoint: 'http://localhost/1001/ktv/',
   hostVideo: 'http://192.168.7.224/',
-  production: false,
+  apiUrl: 'http://localhost/_alexisgroup/KTV-v2/server',
   pusher: {
+    httpHost: window.location.hostname,
+    wsHost: window.location.hostname,
+    authEndpoint: 'http://localhost/_alexisgroup/KTV-v2/server/broadcasting/auth',
     key: '2c5db2342d2bbac9a70b',
-    cluster: 'ap1',
-    authEndpoint: 'http://localhost/1001/ktv/broadcasting/auth',
-    broadcaster: 'pusher',
-    httpHost: "sockjs.pusher.com",
-    encrypted: false,
-    disableStats: true,
-    wsHost: 'localhost',
-    wsPort: 6001
+    cluster: 'ap1'
   }
 };
 
