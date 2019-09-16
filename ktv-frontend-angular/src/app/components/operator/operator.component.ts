@@ -197,12 +197,12 @@ export class OperatorComponent implements OnInit {
   playlistDrop(event: CdkDragDrop < string[] > ) {
     // table
     const prevIndex = event.item.data;
-    moveItemInArray(this.source.playlists.data, prevIndex, event.currentIndex);
+    moveItemInArray(this.data.playlists, prevIndex, event.currentIndex);
     this.table.renderRows();
 
     // post to server
     this.data.room.dataList = [];
-    this.source.playlists.data.forEach((v) => {
+    this.data.playlists.forEach((v) => {
       this.data.room.dataList.push(v.id);
     });
     this.operator.playlistSongReorder(this.data.room).subscribe(res => res, error => console.log(error));
