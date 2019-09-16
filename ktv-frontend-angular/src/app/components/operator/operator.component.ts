@@ -272,6 +272,8 @@ export class OperatorComponent implements OnInit {
   }
 
   formSearchClear() {
+    this.songPaginator.pageIndex = 0;
+    this.param.song.start = 0;
     this.form.search.song = '';
     this.form.search.artist = '';
     this.form.search.language = '';

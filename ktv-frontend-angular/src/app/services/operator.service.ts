@@ -17,8 +17,14 @@ export class OperatorService {
     return this.http.get(`${this.env.apiUrl}/api/operator/room`).pipe(catchError(this.errorHandler));
   }
 
-  song(page?: number) {
-    return this.http.get(`${this.env.apiUrl}/api/operator/browse`, { params: { page: `${page}` }}).pipe(catchError(this.errorHandler));
+  song(page?) {
+    let params = new HttpParams();
+
+    if (page !== undefined && page !== '') {
+      params = params.append('page', page);
+    }
+
+    return this.http.get(`${this.env.apiUrl}/api/operator/browse`, { params }).pipe(catchError(this.errorHandler));
   }
 
   call() {
