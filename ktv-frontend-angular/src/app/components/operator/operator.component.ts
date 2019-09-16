@@ -39,6 +39,7 @@ export class OperatorComponent implements OnInit {
     this.data.songs = [];
     this.data.rooms = [];
     this.data.calls = [];
+    this.data.playlists = [];
 
     this.data.song = {};
     this.data.room = {};
@@ -134,7 +135,8 @@ export class OperatorComponent implements OnInit {
 
   roomPlaylist(res) {
     this.data.player.playing = res.payloads.room.player.playing;
-    this.source.playlists = new MatTableDataSource(res.payloads.room.playlist);
+    this.data.playlists = res.payloads.room.playlist;
+    this.source.playlists = new MatTableDataSource(this.data.playlists);
   }
 
   roomSelect(data) {
@@ -154,7 +156,7 @@ export class OperatorComponent implements OnInit {
   }
 
   callSelect(data) {
-    this.operator.callRespond(data.room.activation_key).subscribe(res => console.log(res), error => console.log(error));
+    this.operator.callRespond(data.room.activation_key).subscribe(res => res, error => console.log(error));
     this.roomSelect(this.data.rooms.find((v, k) => v.id === data.room_id));
   }
 
@@ -170,13 +172,13 @@ export class OperatorComponent implements OnInit {
   songPlaylistSelect(data) {
     if (this.data.room.session) {
       this.data.room.songId = data.id;
-      this.operator.playing(this.data.room).subscribe(res => console.log(res), error => console.log(error));
+      this.operator.playing(this.data.room).subscribe(res => res, error => console.log(error));
     }
   }
 
   playToggle() {
     if (this.data.room.session) {
-      this.operator.playToggle(this.data.room.key).subscribe(res => console.log(res), error => console.log(error));
+      this.operator.playToggle(this.data.room.key).subscribe(res => res, error => console.log(error));
     }
   }
 
@@ -185,6 +187,7 @@ export class OperatorComponent implements OnInit {
     this.data.room = {};
     this.data.player = {};
     this.source.playlists = [];
+    this.data.playlists = [];
     this.data.room.selected = [];
     data.forEach((v, k) => {
       this.data.room.selected[k] = this.selected;
@@ -202,13 +205,13 @@ export class OperatorComponent implements OnInit {
     this.source.playlists.data.forEach((v) => {
       this.data.room.dataList.push(v.id);
     });
-    this.operator.playlistSongReorder(this.data.room).subscribe(res => console.log(res), error => console.log(error));
+    this.operator.playlistSongReorder(this.data.room).subscribe(res => res, error => console.log(error));
   }
 
   addSongToPlaylist(data) {
     if (this.data.room.session) {
       this.data.room.songId = data.id;
-      this.operator.playlistSongAdd(this.data.room).subscribe(res => console.log(res), error => console.log(error));
+      this.operator.playlistSongAdd(this.data.room).subscribe(res => res, error => console.log(error));
     } else {
       console.log('Room session not active');
     }
@@ -218,10 +221,10 @@ export class OperatorComponent implements OnInit {
     if (this.data.room.session) {
         const dialogRef = this.dialog.open(DialogDeleteComponent);
         dialogRef.afterClosed().subscribe(result => {
-          console.log('The dialog was closed', result);
+          // console.log('The dialog was closed', result);
           if (result === true) {
-            this.source.playlists.data.forEach((v) => {
-              console.log(v);
+            this.data.playlists.forEach((v) => {
+              // console.log(v);
               this.deleteSongFromPlaylist(v);
             });
           }
@@ -233,16 +236,16 @@ export class OperatorComponent implements OnInit {
 
   deleteSongFromPlaylist(data) {
     this.data.room.songListId = data.id;
-    this.operator.playlistSongDelete(this.data.room).subscribe(res => console.log(res), error => console.log(error));
+    this.operator.playlistSongDelete(this.data.room).subscribe(res => res, error => console.log(error));
   }
 
   channelRoomCall() {
     window.Echo.channel(`rooms`)
       .listen('.respond.operator', message => {
-        console.log('respond rooms', message);
+        // console.log('respond rooms', message);
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       }).listen('.call.operator', message => {
-        console.log('call rooms', message);
+        // console.log('call rooms', message);
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       });
   }
@@ -251,11 +254,12 @@ export class OperatorComponent implements OnInit {
     // listing playlist change
     window.Echo.channel(`session.${data.token}`)
       .listen('.playlist.updated', playlist => {
-        console.log(playlist);
+        // console.log(playlist);
+        this.data.playlists = playlist;
         this.source.playlists.connect().next(playlist);
       })
       .listen('.player.stateUpdated', state => {
-        console.log('player.stateUpdated ' + state.action);
+        // console.log('player.stateUpdated ' + state.action);
         this.data.player.playing = state.action;
       });
   }
