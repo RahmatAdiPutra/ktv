@@ -29,28 +29,27 @@ export class OperatorService {
     return this.http.get(`${this.env.apiUrl}/api/operator/lang`).pipe(catchError(this.errorHandler));
   }
 
-  search(query, artist?: string, language?: number, page?: number, type: string = 'all', genre?: number) {
-    if (query === undefined) {
-      query = '';
+  search(query, artist?, language?, page?) {
+    let params = new HttpParams();
+
+    if (query !== undefined && query !== '') {
+      params = params.append('q', query);
     }
 
-    if (language === undefined) {
-      language = 0;
+    if (artist !== undefined && artist !== '') {
+      params = params.append('artist', artist);
     }
 
-    if (artist === undefined) {
-      artist = '';
+    if (language !== undefined && language !== '') {
+      params = params.append('lang', language);
+    }
+
+    if (page !== undefined && page !== '') {
+      params = params.append('page', page);
     }
 
     return this.http
-      .get(`${this.env.apiUrl}/api/operator/search`, {
-        params: {
-          q: `${query}`,
-          artist: `${artist}`,
-          lang: `${language}`,
-          page: `${page}`
-        }
-      }).pipe(catchError(this.errorHandler));
+      .get(`${this.env.apiUrl}/api/operator/search`, {params}).pipe(catchError(this.errorHandler));
   }
 
   playlist(key) {

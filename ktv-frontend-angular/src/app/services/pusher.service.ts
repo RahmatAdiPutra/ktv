@@ -26,12 +26,12 @@ export class PusherService {
     });
 
     window.Echo.connector.pusher.connection.bind('state_change', (states: any) => {
-      console.log(states);
+      // console.log(states);
       if (states.previous === 'unavailable' && states.current === 'connected') {
-        console.log('Socket ' + states.current);
+        // console.log('Socket ' + states.current);
         this.router.navigate(['/']);
       } else if (states.previous === 'connecting' && states.current === 'unavailable') {
-        console.log('Socket ' + states.current);
+        // console.log('Socket ' + states.current);
         this.router.navigate(['/' + states.current]);
       }
     });

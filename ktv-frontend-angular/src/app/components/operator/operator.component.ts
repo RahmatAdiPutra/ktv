@@ -109,7 +109,6 @@ export class OperatorComponent implements OnInit {
   }
 
   songSearch(res) {
-    console.log(res);
     if (res.error === false) {
       const data = {
         payloads: res.payloads.results.song
@@ -264,7 +263,7 @@ export class OperatorComponent implements OnInit {
   formSearch() {
     this.songPaginator.pageIndex = 0;
     this.param.song.start = 0;
-    if (this.form.search) {
+    if (this.form.search.song) {
       this.operator.search(this.form.search.song, this.form.search.artist, this.form.search.language, 1).subscribe(
         res => this.songSearch(res),
         error => console.log(error)
