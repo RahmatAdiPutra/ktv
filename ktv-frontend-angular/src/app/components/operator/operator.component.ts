@@ -66,11 +66,6 @@ export class OperatorComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.param.song.length = 25;
-    // this.param.song.orderColumn = '3';
-    // this.param.song.orderDir = 'desc';
-    // this.param.room.orderColumn = '2';
-    // this.param.room.orderDir = 'asc';
     this.operator.song().subscribe(res => this.song(res), error => console.log(error));
     this.operator.language().subscribe(res => this.language(res), error => console.log(error));
     this.operator.room().subscribe(res => this.room(res), error => console.log(error));
@@ -85,8 +80,6 @@ export class OperatorComponent implements OnInit {
     this.data.songs = res.payloads.data;
     this.source.songs = new MatTableDataSource(this.data.songs);
     this.source.songs.paginator = this.songPaginator;
-    // this.page.song.pageSizeOptions = [100, 50, 25, 10];
-    // this.page.song.pageSizeOptions = [res.payloads.per_page];
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
     this.page.song.current_page = res.payloads.current_page;
@@ -106,46 +99,30 @@ export class OperatorComponent implements OnInit {
 
   songPageEvent(page) {
     if (this.form.search.song) {
-      // this.param.search.page = page.pageIndex + 1;
-      // this.songService.getSearch(this.param.search).subscribe(res => this.songSearch(res), error => console.log(error));
+      this.operator.search(this.form.search.song, this.form.search.artist, this.form.search.language, (page.pageIndex + 1)).subscribe(
+        res => this.songSearch(res),
+        error => console.log(error)
+      );
     } else {
-      // this.param.song.start = page.pageSize * page.pageIndex;
-      // this.param.song.length = page.pageSize;
       this.operator.song(page.pageIndex + 1).subscribe(res => this.songRefresh(res), error => console.log(error));
     }
   }
 
   songSearch(res) {
-    const data = {
-      payloads: res.payloads.results.song
-    };
-    this.songRefresh(data);
+    console.log(res);
+    if (res.error === false) {
+      const data = {
+        payloads: res.payloads.results.song
+      };
+      this.songRefresh(data);
+    }
   }
 
   songRefresh(res) {
     this.data.songs = res.payloads.data;
     this.source.songs = new MatTableDataSource(this.data.songs);
-    if (this.form.search.song) {
-      // this.page.song.pageSizeOptions = [10];
-    } else {
-      // this.page.song.pageSizeOptions = [100, 50, 25, 10];
-    }
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
-  }
-
-  formSearch() {
-    console.log(this.form.search);
-    if (this.form.search.song) {
-      // this.operator.search(this.form.search.song, this.form.search.language).subscribe(
-      //   res => console.log(res),
-      //   error => console.log(error)
-      // );
-      this.operator.search(this.form.search.song, this.form.search.language).subscribe(
-        res => this.songSearch(res),
-        error => console.log(error)
-      );
-    }
   }
 
   roomRefresh(res) {
@@ -284,57 +261,23 @@ export class OperatorComponent implements OnInit {
       });
   }
 
-  formSearchClear() {
-    delete this.param.song.song;
-    delete this.param.song.artist;
-    delete this.param.song.language;
-    delete this.param.song.new;
+  formSearch() {
     this.songPaginator.pageIndex = 0;
     this.param.song.start = 0;
+    if (this.form.search) {
+      this.operator.search(this.form.search.song, this.form.search.artist, this.form.search.language, 1).subscribe(
+        res => this.songSearch(res),
+        error => console.log(error)
+      );
+    }
+  }
+
+  formSearchClear() {
     this.form.search.song = '';
     this.form.search.artist = '';
     this.form.search.language = '';
     this.form.search.new = 0;
-    this.songService.getSong(this.form.search).subscribe(res => this.songRefresh(res), error => console.log(error));
-  }
-
-  test() {
-    this.songPaginator.pageIndex = 0;
-    this.param.song.start = 0;
-    if (this.form.search.song) {
-      delete this.param.search.page;
-      this.data.search.q = this.form.search.song;
-
-      if (this.form.search.artist) {
-        this.data.search.artist = this.form.search.artist;
-      } else {
-        delete this.data.search.artist;
-        delete this.param.search.artist;
-      }
-
-      if (this.form.search.language) {
-        this.data.search.lang =  this.form.search.language;
-      } else {
-        delete this.data.search.lang;
-        delete this.param.search.lang;
-      }
-
-      // tslint:disable-next-line: forin
-      for (const key in this.data.search) {
-        this.param.search[key] = this.data.search[key];
-      }
-
-      this.songService.getSearch(this.param.search).subscribe(res => this.songSearch(res), error => console.log(error));
-    } else {
-      this.form.search.new = this.form.search.new ? 1 : 0;
-
-      // tslint:disable-next-line: forin
-      for (const key in this.form.search) {
-        this.param.song[key] = this.form.search[key];
-      }
-
-      this.songService.getSong(this.param.song).subscribe(res => this.songRefresh(res), error => console.log(error));
-    }
+    this.operator.song().subscribe(res => this.song(res), error => console.log(error));
   }
 
 }
