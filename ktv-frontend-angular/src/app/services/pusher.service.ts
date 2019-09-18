@@ -32,7 +32,7 @@ export class PusherService {
         this.router.navigate(['/']);
       } else if (states.previous === 'connecting' && states.current === 'unavailable') {
         // console.log('Socket ' + states.current);
-        this.router.navigate(['/' + states.current]);
+        this.router.navigate(['/offline']);
       }
     });
   }
