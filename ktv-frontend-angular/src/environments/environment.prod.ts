@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  hostVideo: 'http://192.168.7.224/',
+  hostVideo: '/',
   apiUrl: '/ktv/server',
   pusher: {
     httpHost: window.location.hostname,
