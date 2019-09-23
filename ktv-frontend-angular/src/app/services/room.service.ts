@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 })
 export class RoomService {
 
-  endpoint = environment.endpoint + 'transaction-data/room/';
+  endpoint = '';
 
   constructor(private http: HttpClient) { }
 

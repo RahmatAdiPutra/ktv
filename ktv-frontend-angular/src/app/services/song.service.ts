@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 })
 export class SongService {
 
-  endpoint = environment.endpoint;
+  endpoint = '';
 
   constructor(private http: HttpClient) { }
 

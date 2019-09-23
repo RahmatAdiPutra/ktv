@@ -1,6 +1,5 @@
 export const environment = {
   production: true,
-  endpoint: 'http://localhost/1001/ktv/',
   hostVideo: 'http://192.168.7.224/',
   apiUrl: '/ktv/server',
   pusher: {

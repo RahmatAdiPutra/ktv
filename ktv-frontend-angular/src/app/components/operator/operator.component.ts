@@ -5,7 +5,6 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { environment } from '../../../environments/environment';
 import { PusherService } from 'src/app/services/pusher.service';
 import { OperatorService } from 'src/app/services/operator.service';
-import { SongService } from 'src/app/services/song.service';
 import { MatDialog } from '@angular/material';
 import { DialogDeleteComponent } from '../dialog-delete/dialog-delete.component';
 
@@ -34,8 +33,7 @@ export class OperatorComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private pusherService: PusherService,
-    private operator: OperatorService,
-    private songService: SongService) {
+    private operator: OperatorService) {
     this.data.songs = [];
     this.data.rooms = [];
     this.data.calls = [];
