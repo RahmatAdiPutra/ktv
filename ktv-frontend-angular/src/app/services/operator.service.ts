@@ -35,19 +35,28 @@ export class OperatorService {
     return this.http.get(`${this.env.apiUrl}/api/operator/lang`).pipe(catchError(this.errorHandler));
   }
 
-  search(query, artist?, language?, page?) {
+  search(query, page?) {
     let params = new HttpParams();
 
-    if (query !== undefined && query !== '') {
-      params = params.append('q', query);
+    if (query.song !== undefined && query.song !== '') {
+      params = params.append('q', query.song);
     }
 
-    if (artist !== undefined && artist !== '') {
-      params = params.append('artist', artist);
+    if (query.artist !== undefined && query.artist !== '') {
+      params = params.append('artist', query.artist);
     }
 
-    if (language !== undefined && language !== '') {
-      params = params.append('lang', language);
+    if (query.language !== undefined && query.language !== '') {
+      params = params.append('lang', query.language);
+    }
+
+    if (query.new !== undefined && query.new !== '') {
+      if (query.new) {
+        query.new = 1;
+      } else {
+        query.new = 0;
+      }
+      params = params.append('isNewSong', query.new);
     }
 
     if (page !== undefined && page !== '') {
