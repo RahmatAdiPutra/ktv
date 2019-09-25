@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { PusherService } from 'src/app/services/pusher.service';
 
 @Component({
   selector: 'app-page-not-found',
@@ -8,7 +7,7 @@ import { PusherService } from 'src/app/services/pusher.service';
 })
 export class PageNotFoundComponent implements OnInit {
 
-  constructor(private pusherService: PusherService) { }
+  constructor() { }
 
   ngOnInit() {
   }

@@ -97,7 +97,7 @@ export class OperatorComponent implements OnInit {
   }
 
   songPageEvent(page) {
-    if (this.form.search.song) {
+    if (this.form.search) {
       this.operator.search(this.form.search, (page.pageIndex + 1)).subscribe(
         res => this.songSearch(res),
         error => console.log(error)
@@ -265,7 +265,7 @@ export class OperatorComponent implements OnInit {
   formSearch() {
     this.songPaginator.pageIndex = 0;
     this.param.song.start = 0;
-    if (this.form.search.song) {
+    if (this.form.search) {
       this.operator.search(this.form.search, 1).subscribe(
         res => this.songSearch(res),
         error => console.log(error)

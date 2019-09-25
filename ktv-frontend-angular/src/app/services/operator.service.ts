@@ -38,8 +38,10 @@ export class OperatorService {
   search(query, page?) {
     let params = new HttpParams();
 
-    if (query.song !== undefined && query.song !== '') {
+    if (query.song) {
       params = params.append('q', query.song);
+    } else {
+      params = params.append('q', '');
     }
 
     if (query.artist !== undefined && query.artist !== '') {

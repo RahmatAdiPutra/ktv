@@ -9,11 +9,12 @@ export class HomeComponent implements OnInit {
 
   allows = ['Home','KTV','Player','Remote','Operator'];
   options = [
-    {name: 'Home', url: '/dashboard', allow: true},
+    {name: 'Home', url: '/home', allow: true},
     {name: 'KTV', url: '/ktv', allow: true},
     {name: 'Player', url: '/player', allow: true},
     {name: 'Remote', url: '/remote', allow: true},
-    {name: 'Operator', url: '/home', allow: true}
+    {name: 'Operator', url: '/', allow: true},
+    {name: 'Login', url: '/login', allow: true}
   ];
 
   constructor() { }
