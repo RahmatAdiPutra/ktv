@@ -164,16 +164,16 @@ export class OperatorComponent implements OnInit {
   songSelect(data) {
     if (data) {
       this.data.song.url = this.data.song.server + data.file_path;
-    } else {
-      this.data.song.url = '';
-      console.log('Playlists empty');
     }
   }
 
   songPlaylistSelect(data) {
     if (this.data.room.session) {
       this.data.room.songId = data.id;
-      this.operator.playing(this.data.room).subscribe(res => res, error => console.log(error));
+      this.operator.playing(this.data.room).subscribe(
+        res => this.openToast('Song ' + this.data.player.playing, ''),
+        error => console.log(error)
+      );
     }
   }
 
@@ -205,12 +205,10 @@ export class OperatorComponent implements OnInit {
   }
 
   playlistDrop(event: CdkDragDrop < string[] > ) {
-    // table
     const prevIndex = event.item.data;
     moveItemInArray(this.data.playlists, prevIndex, event.currentIndex);
     this.table.renderRows();
 
-    // post to server
     this.data.room.dataList = [];
     this.data.playlists.forEach((v) => {
       this.data.room.dataList.push(v.id);
@@ -235,10 +233,8 @@ export class OperatorComponent implements OnInit {
       if (this.data.playlists.length) {
         const dialogRef = this.dialog.open(DialogDeleteComponent);
         dialogRef.afterClosed().subscribe(result => {
-          // console.log('The dialog was closed', result);
           if (result === true) {
             this.data.playlists.forEach((v) => {
-              // console.log(v);
               this.deleteSongFromPlaylist(v);
             });
           }
