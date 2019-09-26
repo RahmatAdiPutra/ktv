@@ -17,7 +17,11 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    this.auth.login(this.form).subscribe(res => this.handle(res), error => console.log(error));
+    if (this.form.username && this.form.password) {
+      this.auth.login(this.form).subscribe(res => this.handle(res), error => console.log(error));
+    } else {
+      this.openToast('Username or password can not empty', '');
+    }
   }
 
   handle(res) {
