@@ -7,6 +7,7 @@ import { PusherService } from 'src/app/services/pusher.service';
 import { OperatorService } from 'src/app/services/operator.service';
 import { MatDialog } from '@angular/material';
 import { DialogDeleteComponent } from '../dialog-delete/dialog-delete.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-operator',
@@ -32,6 +33,7 @@ export class OperatorComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
+    private toast: MatSnackBar,
     private pusherService: PusherService,
     private operator: OperatorService) {
     this.data.songs = [];
@@ -138,6 +140,7 @@ export class OperatorComponent implements OnInit {
   }
 
   roomSelect(data) {
+    this.leaveChannel();
     this.roomSelectClear(this.data.rooms);
     const index = this.data.rooms.indexOf(data);
     this.data.room.selected[index] = !this.data.room.selected[index];
@@ -149,7 +152,7 @@ export class OperatorComponent implements OnInit {
       this.operator.playlist(this.data.room.key).subscribe(res => this.roomPlaylist(res), error => console.log(error));
       this.channelRoomPlaylist(this.data.room);
     } else {
-      console.log('Room session not active');
+      this.openToast('Room session not active', '');
     }
   }
 
@@ -176,7 +179,16 @@ export class OperatorComponent implements OnInit {
 
   playToggle() {
     if (this.data.room.session) {
-      this.operator.playToggle(this.data.room.key).subscribe(res => res, error => console.log(error));
+      if (this.data.playlists.length) {
+        this.operator.playToggle(this.data.room.key).subscribe(
+          res => this.openToast('Song ' + this.data.player.playing, ''),
+          error => console.log(error)
+        );
+      } else {
+        this.openToast('There are no songs in the playlist', '');
+      }
+    } else {
+      this.openToast('There are no songs in the playlist', '');
     }
   }
 
@@ -209,14 +221,18 @@ export class OperatorComponent implements OnInit {
   addSongToPlaylist(data) {
     if (this.data.room.session) {
       this.data.room.songId = data.id;
-      this.operator.playlistSongAdd(this.data.room).subscribe(res => res, error => console.log(error));
+      this.operator.playlistSongAdd(this.data.room).subscribe(
+        res => this.openToast('Song added to playlist', ''),
+        error => console.log(error)
+      );
     } else {
-      console.log('Room session not active');
+      this.openToast('Room session not active', '');
     }
   }
 
   deleteAllSongFromPlaylist() {
     if (this.data.room.session) {
+      if (this.data.playlists.length) {
         const dialogRef = this.dialog.open(DialogDeleteComponent);
         dialogRef.afterClosed().subscribe(result => {
           // console.log('The dialog was closed', result);
@@ -227,23 +243,29 @@ export class OperatorComponent implements OnInit {
             });
           }
         });
+      } else {
+        this.openToast('There are no songs in the playlist', '');
+      }
     } else {
-      console.log('Room session not active');
+      this.openToast('There are no songs in the playlist', '');
     }
   }
 
   deleteSongFromPlaylist(data) {
     this.data.room.songListId = data.id;
-    this.operator.playlistSongDelete(this.data.room).subscribe(res => res, error => console.log(error));
+    this.operator.playlistSongDelete(this.data.room).subscribe(
+      res => this.openToast('Song deleted from playlist', ''),
+      error => console.log(error)
+    );
   }
 
   channelRoomCall() {
     window.Echo.channel(`rooms`)
       .listen('.respond.operator', message => {
-        // console.log('respond rooms', message);
+        this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       }).listen('.call.operator', message => {
-        // console.log('call rooms', message);
+        this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       });
   }
@@ -252,14 +274,20 @@ export class OperatorComponent implements OnInit {
     // listing playlist change
     window.Echo.channel(`session.${data.token}`)
       .listen('.playlist.updated', playlist => {
-        // console.log(playlist);
         this.data.playlists = playlist;
         this.source.playlists.connect().next(playlist);
+        if (!this.data.playlists.length) {
+          this.data.player.playing = 'pause';
+        }
       })
       .listen('.player.stateUpdated', state => {
         // console.log('player.stateUpdated ' + state.action);
         this.data.player.playing = state.action;
       });
+  }
+
+  private leaveChannel() {
+    window.Echo.leave(`session.${this.data.room.token}`);
   }
 
   formSearch() {
@@ -281,6 +309,12 @@ export class OperatorComponent implements OnInit {
     this.form.search.language = '';
     this.form.search.new = false;
     this.operator.song().subscribe(res => this.song(res), error => console.log(error));
+  }
+
+  openToast(message: string, action: string) {
+    this.toast.open(message, action, {
+      duration: 2000,
+    });
   }
 
 }
