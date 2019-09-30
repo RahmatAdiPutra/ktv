@@ -304,7 +304,7 @@ export class OperatorComponent implements OnInit {
     this.form.search.artist = '';
     this.form.search.language = '';
     this.form.search.new = false;
-    this.operator.song().subscribe(res => this.song(res), error => console.log(error));
+    this.operator.song().subscribe(res => this.songRefresh(res), error => console.log(error));
   }
 
   openToast(message: string, action: string) {
