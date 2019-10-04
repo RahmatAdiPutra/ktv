@@ -6,6 +6,7 @@ import { KtvComponent } from './components/ktv/ktv.component';
 import { PlayerComponent } from './components/player/player.component';
 import { RemoteComponent } from './components/remote/remote.component';
 import { OperatorComponent } from './components/operator/operator.component';
+import { PlaylistComponent } from './components/playlist/playlist.component';
 import { LoginComponent } from './components/login/login.component';
 import { OfflineComponent } from './components/offline/offline.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
@@ -19,6 +20,7 @@ const routes: Routes = [
   // { path: 'player/:token', component: PlayerComponent },
   // { path: 'remote', component: RemoteComponent },
   { path: '', component: OperatorComponent, canActivate: [AuthGuard] },
+  { path: 'playlist', component: PlaylistComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
   { path: 'offline', component: OfflineComponent },
   { path: '**', component: PageNotFoundComponent },

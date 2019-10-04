@@ -40,6 +40,7 @@ export class OperatorComponent implements OnInit {
     this.data.rooms = [];
     this.data.calls = [];
     this.data.playlists = [];
+    this.data.audio = [];
 
     this.data.song = {};
     this.data.room = {};
@@ -192,6 +193,21 @@ export class OperatorComponent implements OnInit {
     }
   }
 
+  vocalToggle() {
+    if (this.data.room.session) {
+      if (this.data.playlists.length) {
+        this.operator.vocalToggle(this.data.room.key).subscribe(
+          res => this.data.player.vocal ? this.openToast('Vocal off', '') : this.openToast('Vocal on', ''),
+          error => console.log(error)
+        );
+      } else {
+        this.openToast('There are no songs in the playlist', '');
+      }
+    } else {
+      this.openToast('There are no songs in the playlist', '');
+    }
+  }
+
   roomSelectClear(data) {
     this.data.song.url = '';
     this.data.room = {};
@@ -258,9 +274,21 @@ export class OperatorComponent implements OnInit {
   channelRoomCall() {
     window.Echo.channel(`rooms`)
       .listen('.respond.operator', message => {
+        let id = '';
+        const room = message.message.split(' ');
+        if (room[room.length - 1] !== 'operator') {
+          id = room[room.length - 1];
+        } else {
+          id = room[1];
+        }
+        // console.log(id);
+        this.sound(false, id);
         this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       }).listen('.call.operator', message => {
+        const id = message.message.split(' ')[1];
+        // console.log(id);
+        this.sound(true, id);
         this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       });
@@ -270,6 +298,7 @@ export class OperatorComponent implements OnInit {
     // listing playlist change
     window.Echo.channel(`session.${data.token}`)
       .listen('.playlist.updated', playlist => {
+        // console.log(playlist);
         this.data.playlists = playlist;
         this.source.playlists.connect().next(playlist);
         if (!this.data.playlists.length) {
@@ -277,8 +306,12 @@ export class OperatorComponent implements OnInit {
         }
       })
       .listen('.player.stateUpdated', state => {
-        // console.log('player.stateUpdated ' + state.action);
-        this.data.player.playing = state.action;
+        // console.log(state);
+        if (state.action === 'vocal') {
+          this.data.player.vocal = state.state.is_karaoke;
+        } else {
+          this.data.player.playing = state.action;
+        }
       });
   }
 
@@ -288,7 +321,6 @@ export class OperatorComponent implements OnInit {
 
   formSearch() {
     this.songPaginator.pageIndex = 0;
-    this.param.song.start = 0;
     if (this.form.search) {
       this.operator.search(this.form.search, 1).subscribe(
         res => this.songSearch(res),
@@ -299,7 +331,6 @@ export class OperatorComponent implements OnInit {
 
   formSearchClear() {
     this.songPaginator.pageIndex = 0;
-    this.param.song.start = 0;
     this.form.search.song = '';
     this.form.search.artist = '';
     this.form.search.language = '';
@@ -311,6 +342,20 @@ export class OperatorComponent implements OnInit {
     this.toast.open(message, action, {
       duration: 2000,
     });
+  }
+
+  sound(res, id) {
+    if (res) {
+      this.data.audio[id] = new Audio();
+      this.data.audio[id].src = '../../../assets/sounds/call-sound.mp3';
+      this.data.audio[id].addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+      }, false);
+      this.data.audio[id].play();
+    } else {
+      this.data.audio[id].src = '';
+    }
   }
 
 }

@@ -24,6 +24,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { DialogDeleteComponent } from './components/dialog-delete/dialog-delete.component';
 import { LoginComponent } from './components/login/login.component';
 import { OfflineComponent } from './components/offline/offline.component';
+import { PlaylistComponent } from './components/playlist/playlist.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { OfflineComponent } from './components/offline/offline.component';
     HomeComponent,
     DialogDeleteComponent,
     LoginComponent,
-    OfflineComponent
+    OfflineComponent,
+    PlaylistComponent
   ],
   entryComponents: [
     DialogDeleteComponent

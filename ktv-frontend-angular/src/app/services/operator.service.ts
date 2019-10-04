@@ -79,6 +79,12 @@ export class OperatorService {
     }).pipe(catchError(this.errorHandler));
   }
 
+  vocalToggle(key) {
+    return this.http.post(`${this.env.apiUrl}/api/controller/control/vocal?tv-token=${key}`, {
+      ok: 1
+    }).pipe(catchError(this.errorHandler));
+  }
+
   playing(data) {
     return this.http.post(`${this.env.apiUrl}/api/controller/playlist/play-this-song?tv-token=${data.key}`, {
        id: data.songId
