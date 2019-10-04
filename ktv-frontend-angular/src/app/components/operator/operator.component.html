@@ -173,18 +173,18 @@
       <div class="h-25">
         <div class="h-100 d-flex flex-column">
           <div class="h-100 m-1 overflow-auto bg-light">
-            <mat-tab-group>
-              <mat-tab label="Priview Video">
+            <!-- <mat-tab-group>
+              <mat-tab label="Priview Video"> -->
                 <div class="d-flex flex-column h-100">
                   <video #player class="h-100 w-100" [src]="data.song.url" controls disablePictureInPicture
                     controlsList="nodownload">
                     <source [src]="data.song.url" type="video/mp4">
                   </video>
                 </div>
-              </mat-tab>
-              <!-- <mat-tab label="Customer Info">Customer info under development</mat-tab>
-              <mat-tab label="Message">Message under development</mat-tab> -->
-            </mat-tab-group>
+              <!-- </mat-tab>
+              <mat-tab label="Customer Info">Customer info under development</mat-tab>
+              <mat-tab label="Message">Message under development</mat-tab>
+            </mat-tab-group> -->
           </div>
         </div>
       </div>
@@ -194,8 +194,8 @@
       <div class="h-75">
         <div class="h-100 d-flex flex-column">
           <div class="h-100 m-1 overflow-auto bg-light">
-            <mat-tab-group>
-              <mat-tab label="Playlist {{ data.room.name }}">
+            <!-- <mat-tab-group>
+              <mat-tab label="Playlist {{ data.room.name }}"> -->
                 <div class="d-flex flex-column h-100">
                   <div class="overflow-auto flex-grow-1 vh-100">
                     <table mat-table [dataSource]="source.playlists" class="w-100" #table cdkDropList
@@ -257,8 +257,8 @@
                     </div>
                   </div>
                 </div>
-              </mat-tab>
-            </mat-tab-group>
+              <!-- </mat-tab>
+            </mat-tab-group> -->
           </div>
         </div>
       </div>
