@@ -355,7 +355,7 @@ export class OperatorComponent implements OnInit {
       this.data.audio[id].load();
       setTimeout(() => {
           this.data.audio[id].play();
-      }, 0);
+      }, 1000);
     } else {
       this.data.audio[id].src = '';
     }
