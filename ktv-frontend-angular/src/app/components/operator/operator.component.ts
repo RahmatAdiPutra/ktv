@@ -352,12 +352,10 @@ export class OperatorComponent implements OnInit {
         this.currentTime = 0;
         this.play();
       }, false);
-      this.data.audio[id].pause();
-      this.data.audio[id].addEventListener('canplay', function onCanPlay() {
-        this.removeEventListener('canplay', onCanPlay);
-        this.play();
-      });
       this.data.audio[id].load();
+      setTimeout(() => {
+          this.data.audio[id].play();
+      }, 0);
     } else {
       this.data.audio[id].src = '';
     }
