@@ -274,21 +274,20 @@ export class OperatorComponent implements OnInit {
   channelRoomCall() {
     window.Echo.channel(`rooms`)
       .listen('.respond.operator', message => {
-        let id = '';
-        const room = message.message.split(' ');
+        let room = message.message.split(' ');
         if (room[room.length - 1] !== 'operator') {
-          id = room[room.length - 1];
+          room = room[room.length - 1];
         } else {
-          id = room[1];
+          room = room[1];
         }
-        // console.log(id);
-        this.sound(false, id);
+        // console.log(room);
+        this.sound(false, room);
         this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       }).listen('.call.operator', message => {
-        const id = message.message.split(' ')[1];
-        // console.log(id);
-        this.sound(true, id);
+        const room = message.message.split(' ')[1];
+        // console.log(room);
+        this.sound(true, room);
         this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
       });
