@@ -347,7 +347,7 @@ export class OperatorComponent implements OnInit {
   sound(res, id) {
     if (res) {
       this.data.audio[id] = new Audio();
-      this.data.audio[id].src = '../../../assets/sounds/call-sound.mp3';
+      this.data.audio[id].src = '/operator/assets/sounds/call-sound.mp3';
       this.data.audio[id].addEventListener('ended', function() {
         this.currentTime = 0;
         this.play();
