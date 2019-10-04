@@ -352,7 +352,7 @@ export class OperatorComponent implements OnInit {
         this.currentTime = 0;
         this.play();
       }, false);
-      this.data.audio[id].play();
+      this.data.audio[id].autoplay();
     } else {
       this.data.audio[id].src = '';
     }
