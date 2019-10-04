@@ -344,17 +344,17 @@ export class OperatorComponent implements OnInit {
     });
   }
 
-  sound(res, id) {
+  sound(res, room) {
     if (res) {
-      this.data.audio[id] = new Audio();
-      this.data.audio[id].src = environment.hostVideo + 'call-operator.mp3';
-      this.data.audio[id].addEventListener('ended', function() {
+      this.data.audio[room] = new Audio();
+      this.data.audio[room].src = environment.hostVideo + 'call-operator.mp3';
+      this.data.audio[room].addEventListener('ended', function() {
         this.currentTime = 0;
         this.play();
       }, false);
-      this.data.audio[id].autoplay = true;
+      this.data.audio[room].autoplay = true;
     } else {
-      this.data.audio[id].src = '';
+      this.data.audio[room].src = '';
     }
   }
 
