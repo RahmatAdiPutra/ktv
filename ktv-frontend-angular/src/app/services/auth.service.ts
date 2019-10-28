@@ -21,6 +21,17 @@ export class AuthService {
     }}).pipe(catchError(this.errorHandler));
   }
 
+  checkValid(data) {
+    this.me(data).subscribe(res => this.isCheckValid(res), error => console.log(error));
+  }
+
+  isCheckValid(data) {
+    if (!data.payloads) {
+      sessionStorage.removeItem('Echo_OperatorKey');
+      this.router.navigate(['/login']);
+    }
+  }
+
   login(data) {
     return this.http.post(`${this.env.apiUrl}/api/operator/login`, {
       username: data.username,
@@ -47,6 +58,10 @@ export class AuthService {
   isValid() {
     const key = this.get();
     if (key) {
+      this.checkValid({
+        user_id: key.split('-')[0],
+        user_name: key.split('-')[1]
+      });
       return true; // replace this line to reduce injection gaps
     }
     return false;
