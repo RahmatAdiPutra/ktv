@@ -163,6 +163,7 @@ export class OperatorComponent implements OnInit {
   }
 
   songSelect(data) {
+    console.log(data);
     if (data) {
       this.data.song.url = this.data.song.server + data.file_path;
     }
