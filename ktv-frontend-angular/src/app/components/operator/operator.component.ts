@@ -336,7 +336,6 @@ export class OperatorComponent implements OnInit {
   }
 
   sound(res) {
-    console.log(this.data.calls);
     if (res) {
       this.data.audio.src = environment.hostVideo + 'call-operator.mp3';
       this.data.audio.addEventListener('ended', function() {
