@@ -65,6 +65,7 @@ export class OperatorComponent implements OnInit {
     this.data.song.url = '';
 
     this.channelRoomCall();
+    this.data.audio = new Audio();
   }
 
   ngOnInit() {
@@ -163,7 +164,6 @@ export class OperatorComponent implements OnInit {
   }
 
   songSelect(data) {
-    console.log(data);
     if (data) {
       this.data.song.url = this.data.song.server + data.file_path;
     }
@@ -275,22 +275,13 @@ export class OperatorComponent implements OnInit {
   channelRoomCall() {
     window.Echo.channel(`rooms`)
       .listen('.respond.operator', message => {
-        let room = message.message.split(' ');
-        if (room[room.length - 1] !== 'operator') {
-          room = room[room.length - 1];
-        } else {
-          room = room[1];
-        }
-        // console.log(room);
-        this.sound(false, room);
-        this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
+        this.openToast(message.message, '');
+        this.sound(false);
       }).listen('.call.operator', message => {
-        const room = message.message.split(' ')[1];
-        // console.log(room);
-        this.sound(true, room);
-        this.openToast(message.message, '');
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
+        this.openToast(message.message, '');
+        this.sound(true);
       });
   }
 
@@ -344,19 +335,20 @@ export class OperatorComponent implements OnInit {
     });
   }
 
-  sound(res, room) {
-    // console.log(room);
-    // if (res) {
-    //   this.data.audio[room] = new Audio();
-    //   this.data.audio[room].src = environment.hostVideo + 'call-operator.mp3';
-    //   this.data.audio[room].addEventListener('ended', function() {
-    //     this.currentTime = 0;
-    //     this.play();
-    //   }, false);
-    //   this.data.audio[room].autoplay = true;
-    // } else {
-    //   this.data.audio[room].src = '';
-    // }
+  sound(res) {
+    console.log(this.data.calls);
+    if (res) {
+      this.data.audio.src = environment.hostVideo + 'call-operator.mp3';
+      this.data.audio.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+      }, false);
+      this.data.audio.autoplay = true;
+    } else {
+      if (this.data.calls.length <= 1) {
+        this.data.audio.src = '';
+      }
+    }
   }
 
 }
