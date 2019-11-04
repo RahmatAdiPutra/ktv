@@ -7,6 +7,7 @@ import { PusherService } from 'src/app/services/pusher.service';
 import { OperatorService } from 'src/app/services/operator.service';
 import { MatDialog } from '@angular/material';
 import { DialogDeleteComponent } from '../dialog-delete/dialog-delete.component';
+import { DialogAllowSoundCallComponent } from '../dialog-allow-sound-call/dialog-allow-sound-call.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -64,8 +65,11 @@ export class OperatorComponent implements OnInit {
     this.data.song.server = environment.hostVideo;
     this.data.song.url = '';
 
-    this.channelRoomCall();
+    this.data.fabButtons = true;
+    this.data.fabTogglerState = 'inactive';
     this.data.audio = new Audio();
+
+    this.channelRoomCall();
   }
 
   ngOnInit() {
@@ -90,9 +94,13 @@ export class OperatorComponent implements OnInit {
   }
 
   room(res) {
-    this.data.rooms = res.payloads.data;
+    this.data.rooms = res.payloads.data.filter(data => data.active_session !== null);
     this.roomSelectClear(this.data.rooms);
     this.source.rooms = new MatTableDataSource(this.data.rooms);
+    const allow = this.getAllowSound();
+    if (!allow.length) {
+      this.setAllowSound(this.data.rooms);
+    }
   }
 
   call(res) {
@@ -279,9 +287,12 @@ export class OperatorComponent implements OnInit {
         this.openToast(message.message, '');
         this.sound(false);
       }).listen('.call.operator', message => {
+        const allow = this.getAllowSound();
         this.operator.call().subscribe(res => this.call(res), error => console.log(error));
         this.openToast(message.message, '');
-        this.sound(true);
+        if (allow.indexOf(message.message.slice(0, -17)) >= 0) {
+          this.sound(true);
+        }
       });
   }
 
@@ -333,6 +344,51 @@ export class OperatorComponent implements OnInit {
     this.toast.open(message, action, {
       duration: 2000,
     });
+  }
+
+  showItems() {
+    this.data.fabTogglerState = 'active';
+    this.data.fabButtons = true;
+  }
+
+  hideItems() {
+    this.data.fabTogglerState = 'inactive';
+    this.data.fabButtons = false;
+  }
+
+  onToggleFab() {
+    this.data.fabButtons ? this.hideItems() : this.showItems();
+    const dialogRef = this.dialog.open(DialogAllowSoundCallComponent, {
+      data: JSON.parse(localStorage.getItem('allow'))
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (typeof result !== 'undefined') {
+        this.setAllowSound(result);
+      }
+    });
+  }
+
+  setAllowSound(data) {
+    const allow = [];
+    data.forEach((v, k) => {
+      allow.push({
+        name: v.name,
+        allow: typeof v.allow === 'undefined' ? true : v.allow
+      });
+    });
+    localStorage.setItem('allow', JSON.stringify(allow));
+  }
+
+  getAllowSound() {
+    const allow = [];
+    if (localStorage.getItem('allow')) {
+      JSON.parse(localStorage.getItem('allow')).forEach((v, k) => {
+        if (v.allow) {
+          allow.push(v.name);
+        }
+      });
+    }
+    return allow;
   }
 
   sound(res) {

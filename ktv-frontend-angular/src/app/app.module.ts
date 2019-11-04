@@ -22,6 +22,7 @@ import { OperatorComponent } from './components/operator/operator.component';
 import { HomeComponent } from './components/home/home.component';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { DialogDeleteComponent } from './components/dialog-delete/dialog-delete.component';
+import { DialogAllowSoundCallComponent } from './components/dialog-allow-sound-call/dialog-allow-sound-call.component';
 import { LoginComponent } from './components/login/login.component';
 import { OfflineComponent } from './components/offline/offline.component';
 import { PlaylistComponent } from './components/playlist/playlist.component';
@@ -36,12 +37,14 @@ import { PlaylistComponent } from './components/playlist/playlist.component';
     OperatorComponent,
     HomeComponent,
     DialogDeleteComponent,
+    DialogAllowSoundCallComponent,
     LoginComponent,
     OfflineComponent,
     PlaylistComponent
   ],
   entryComponents: [
-    DialogDeleteComponent
+    DialogDeleteComponent,
+    DialogAllowSoundCallComponent
   ],
   imports: [
     BrowserModule,

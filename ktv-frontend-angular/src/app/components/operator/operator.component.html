@@ -68,6 +68,20 @@
             <tr mat-header-row *matHeaderRowDef="column.calls; sticky: true"></tr>
             <tr mat-row *matRowDef="let row; columns: column.calls;"></tr>
           </table>
+          <div>
+            <div id="fab-dismiss" 
+                *ngIf="fabTogglerState==='active'" 
+                (click)="onToggleFab()">
+            </div>
+            <div class="fab-container">
+              <button mat-mini-fab class="fab-toggler" color="primary" (click)="onToggleFab()">
+                <mat-icon>view_headline</mat-icon>
+              </button>
+              <div>
+                
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -240,19 +254,27 @@
                         [cdkDragData]="[i]" [ngClass]="row.now_playing ? 'selected' : ''"></tr>
                     </table>
                   </div>
-                  <div class="d-flex flex-row justify-content-center w-100 bg-white">
+                  <div class="d-flex flex-row justify-content-between w-100 bg-white">
                     <div class="p-1">
-                      <button class="m-1" mat-mini-fab color="primary" (click)="playToggle()">
-                        <mat-icon *ngIf="data.player.playing === 'playing'; else pause">pause</mat-icon>
-                        <ng-template #pause>
+                      <button class="m-1" mat-raised-button color="primary" (click)="playToggle()">
+                        <div *ngIf="data.player.playing === 'playing'; then thenPlay; else elsePlay">pause</div>
+                        <ng-template #thenPlay>
+                            <mat-icon>pause</mat-icon>
+                        </ng-template>
+                        <ng-template #elsePlay>
                             <mat-icon>play_arrow</mat-icon>
                         </ng-template>
                       </button>
-                      <button class="m-1" mat-mini-fab color="primary" (click)="vocalToggle()">
-                        <mat-icon *ngIf="data.player.vocal === true; else vocal">mic_off</mat-icon>
-                        <ng-template #vocal>
-                            <mat-icon>mic</mat-icon>
-                        </ng-template>
+                      <button class="m-1" mat-raised-button color="primary" (click)="vocalToggle()">
+                          <div *ngIf="data.player.vocal === true; then thenVocal; else elseVocal"></div>
+                          <ng-template #thenVocal>
+                              <mat-icon>mic_off</mat-icon>
+                              Vocal : Off
+                          </ng-template>
+                          <ng-template #elseVocal>
+                              <mat-icon>mic</mat-icon>
+                              Vocal : On
+                          </ng-template>
                       </button>
                     </div>
                   </div>

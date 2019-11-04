@@ -80,3 +80,8 @@ export interface HttpResponse {
   line?: string;
   ip?: string;
 }
+
+export interface AllowSoundCall {
+  room: string;
+  allow: boolean;
+}
