@@ -181,7 +181,7 @@
             <!-- <mat-tab-group>
               <mat-tab label="Priview Video"> -->
                 <div class="d-flex flex-column h-100">
-                  <video #player class="h-100 w-100" [src]="data.song.url" controls disablePictureInPicture
+                  <video #player class="h-100 w-100" [src]="data.song.url" controls autoplay disablePictureInPicture
                     controlsList="nodownload">
                     <source [src]="data.song.url" type="video/mp4">
                   </video>
