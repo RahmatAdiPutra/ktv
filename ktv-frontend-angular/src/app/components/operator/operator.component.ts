@@ -65,8 +65,6 @@ export class OperatorComponent implements OnInit {
     this.data.song.server = environment.hostVideo;
     this.data.song.url = '';
 
-    this.data.fabButtons = true;
-    this.data.fabTogglerState = 'inactive';
     this.data.audio = new Audio();
 
     this.channelRoomCall();
@@ -346,18 +344,7 @@ export class OperatorComponent implements OnInit {
     });
   }
 
-  showItems() {
-    this.data.fabTogglerState = 'active';
-    this.data.fabButtons = true;
-  }
-
-  hideItems() {
-    this.data.fabTogglerState = 'inactive';
-    this.data.fabButtons = false;
-  }
-
   onToggleFab() {
-    this.data.fabButtons ? this.hideItems() : this.showItems();
     const dialogRef = this.dialog.open(DialogAllowSoundCallComponent, {
       data: JSON.parse(localStorage.getItem('allow'))
     });

@@ -68,19 +68,10 @@
             <tr mat-header-row *matHeaderRowDef="column.calls; sticky: true"></tr>
             <tr mat-row *matRowDef="let row; columns: column.calls;"></tr>
           </table>
-          <div>
-            <div id="fab-dismiss" 
-                *ngIf="data.fabTogglerState==='active'" 
-                (click)="onToggleFab()">
-            </div>
-            <div class="fab-container">
-              <button mat-mini-fab class="fab-toggler" color="primary" (click)="onToggleFab()">
-                <mat-icon>view_headline</mat-icon>
-              </button>
-              <div>
-                
-              </div>
-            </div>
+          <div class="fab-container">
+            <button mat-mini-fab class="fab-toggler" color="primary" (click)="onToggleFab()">
+              <mat-icon>view_headline</mat-icon>
+            </button>
           </div>
         </div>
       </div>
