@@ -84,7 +84,7 @@
   <div class="d-flex flex-row w-80">
     <!-- SONG AND PLAYLIST -->
     <div class="d-flex flex-column w-60">
-      <div class="h-100 m-1 bg-light">
+      <div class="h-100 m-1 overflow-auto bg-light">
         <mat-tab-group [backgroundColor]="'primary'" [color]="'warn'" (selectedTabChange)="$event.index === 1 ? formSearch(false) : ''">
           <mat-tab label="Song">
             <div class="h-100 d-flex flex-column">
@@ -127,7 +127,7 @@
               <!-- END SONG SEARCHING -->
 
               <!-- SONG BANK -->
-              <div class="m-1 vh-100">
+              <div class="m-1 overflow-auto vh-100">
                 <div class="h-100 d-flex flex-column">
                   <div class="bg-light overflow-auto flex-grow-1 vh-100">
                     <table mat-table [dataSource]="source.songs" class="w-100 song">
@@ -205,7 +205,7 @@
               <!-- END PLAYLIST SEARCHING -->
 
               <!-- PLAYLIST BANK -->
-              <div class="m-1 vh-100">
+              <div class="m-1 overflow-auto vh-100">
                 <div class="h-100 d-flex flex-column">
                   <div class="bg-light overflow-auto">
                     <table mat-table [dataSource]="source.playlistCategory" multiTemplateDataRows class="w-100">
@@ -286,18 +286,12 @@
       <div class="h-25">
         <div class="h-100 d-flex flex-column">
           <div class="h-100 m-1 overflow-auto bg-light">
-            <!-- <mat-tab-group>
-              <mat-tab label="Priview Video"> -->
-                <div class="d-flex flex-column h-100">
-                  <video #player class="h-100 w-100" [src]="data.song.url" controls autoplay disablePictureInPicture
-                    controlsList="nodownload">
-                    <source [src]="data.song.url" type="video/mp4">
-                  </video>
-                </div>
-              <!-- </mat-tab>
-              <mat-tab label="Customer Info">Customer info under development</mat-tab>
-              <mat-tab label="Message">Message under development</mat-tab>
-            </mat-tab-group> -->
+            <div class="h-100 d-flex flex-column">
+              <video #player class="h-100 w-100" [src]="data.song.url" controls autoplay disablePictureInPicture
+                controlsList="nodownload">
+                <source [src]="data.song.url" type="video/mp4">
+              </video>
+            </div>
           </div>
         </div>
       </div>
@@ -306,80 +300,76 @@
       <!-- ROOM PLAYLIST -->
       <div class="h-75">
         <div class="h-100 d-flex flex-column">
-          <div class="h-100 m-1 bg-light">
-            <!-- <mat-tab-group>
-              <mat-tab label="Playlist {{ data.room.name }}"> -->
-                <div class="h-100 d-flex flex-column">
-                  <div class="overflow-auto flex-grow-1 vh-100">
-                    <table mat-table [dataSource]="source.playlists" class="w-100" #table cdkDropList
-                      [cdkDropListData]="source.playlists" (cdkDropListDropped)="roomPlaylistDrop($event)">
-                      <ng-container matColumnDef="title">
-                        <th mat-header-cell *matHeaderCellDef> Title </th>
-                        <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)"> {{row.song.title}} </td>
-                      </ng-container>
+          <div class="h-100 m-1 overflow-auto bg-light">
+            <div class="h-100 d-flex flex-column">
+              <div class="overflow-auto flex-grow-1 vh-100">
+                <table mat-table [dataSource]="source.playlists" class="w-100" #table cdkDropList
+                  [cdkDropListData]="source.playlists" (cdkDropListDropped)="roomPlaylistDrop($event)">
+                  <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef> Title </th>
+                    <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)"> {{row.song.title}} </td>
+                  </ng-container>
 
-                      <ng-container matColumnDef="artist">
-                        <th mat-header-cell *matHeaderCellDef> Artist </th>
-                        <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)"> {{row.song.artist_label}} </td>
-                      </ng-container>
+                  <ng-container matColumnDef="artist">
+                    <th mat-header-cell *matHeaderCellDef> Artist </th>
+                    <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)"> {{row.song.artist_label}} </td>
+                  </ng-container>
 
-                      <ng-container matColumnDef="is_play">
-                        <th mat-header-cell *matHeaderCellDef width="50"></th>
-                        <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)">
-                          <div *ngIf="row.now_playing">
-                            <mat-icon *ngIf="data.player.playing === 'playing'; else pause">play_arrow</mat-icon>
-                            <ng-template #pause>
-                                <mat-icon>pause</mat-icon>
-                            </ng-template>
-                          </div>
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="action">
-                        <th mat-header-cell *matHeaderCellDef width="50"> 
-                          <button mat-icon-button [disabled]="data.room.session ? false : true" (click)="roomPlaylistDeleteAllSong()">
-                            <mat-icon>delete</mat-icon>
-                          </button>
-                        </th>
-                        <td mat-cell *matCellDef="let row;">
-                          <button mat-icon-button color="warn" (click)="roomPlaylistDeleteSong(row)">
-                            <mat-icon>delete_forever</mat-icon>
-                          </button>
-                        </td>
-                      </ng-container>
-
-                      <tr mat-header-row *matHeaderRowDef="column.playlists; sticky: true"></tr>
-                      <tr mat-row *matRowDef="let row; columns: column.playlists; let i = index;" cdkDrag
-                        [cdkDragData]="[i]" [ngClass]="row.now_playing ? 'selected' : ''"></tr>
-                    </table>
-                  </div>
-                  <div class="d-flex flex-row justify-content-between w-100 bg-white">
-                    <div class="p-1">
-                      <button class="m-1" [disabled]="data.room.session ? false : true" mat-raised-button color="primary" (click)="roomPlaylistTogglePlay()">
-                        <div *ngIf="data.player.playing === 'playing'; then thenPlay; else elsePlay">pause</div>
-                        <ng-template #thenPlay>
-                            <mat-icon>pause</mat-icon> Pause
+                  <ng-container matColumnDef="is_play">
+                    <th mat-header-cell *matHeaderCellDef width="50"></th>
+                    <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)">
+                      <div *ngIf="row.now_playing">
+                        <mat-icon *ngIf="data.player.playing === 'playing'; else pause">play_arrow</mat-icon>
+                        <ng-template #pause>
+                            <mat-icon>pause</mat-icon>
                         </ng-template>
-                        <ng-template #elsePlay>
-                            <mat-icon>play_arrow</mat-icon> Play
-                        </ng-template>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef width="50"> 
+                      <button mat-icon-button [disabled]="data.room.session ? false : true" (click)="roomPlaylistDeleteAllSong()">
+                        <mat-icon>delete</mat-icon>
                       </button>
-                      <button class="m-1" [disabled]="data.room.session ? false : true" mat-raised-button color="primary" (click)="roomPlaylistToggleVocal()">
-                          <div *ngIf="data.player.vocal === true; then thenVocal; else elseVocal"></div>
-                          <ng-template #thenVocal>
-                              <mat-icon>mic_off</mat-icon>
-                              Vocal : Off
-                          </ng-template>
-                          <ng-template #elseVocal>
-                              <mat-icon>mic</mat-icon>
-                              Vocal : On
-                          </ng-template>
+                    </th>
+                    <td mat-cell *matCellDef="let row;">
+                      <button mat-icon-button color="warn" (click)="roomPlaylistDeleteSong(row)">
+                        <mat-icon>delete_forever</mat-icon>
                       </button>
-                    </div>
-                  </div>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="column.playlists; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: column.playlists; let i = index;" cdkDrag
+                    [cdkDragData]="[i]" [ngClass]="row.now_playing ? 'selected' : ''"></tr>
+                </table>
+              </div>
+              <div class="d-flex flex-row justify-content-between w-100 bg-white">
+                <div class="p-1">
+                  <button class="m-1" [disabled]="data.room.session ? false : true" mat-raised-button color="primary" (click)="roomPlaylistTogglePlay()">
+                    <div *ngIf="data.player.playing === 'playing'; then thenPlay; else elsePlay">pause</div>
+                    <ng-template #thenPlay>
+                        <mat-icon>pause</mat-icon> Pause
+                    </ng-template>
+                    <ng-template #elsePlay>
+                        <mat-icon>play_arrow</mat-icon> Play
+                    </ng-template>
+                  </button>
+                  <button class="m-1" [disabled]="data.room.session ? false : true" mat-raised-button color="primary" (click)="roomPlaylistToggleVocal()">
+                      <div *ngIf="data.player.vocal === true; then thenVocal; else elseVocal"></div>
+                      <ng-template #thenVocal>
+                          <mat-icon>mic_off</mat-icon>
+                          Vocal : Off
+                      </ng-template>
+                      <ng-template #elseVocal>
+                          <mat-icon>mic</mat-icon>
+                          Vocal : On
+                      </ng-template>
+                  </button>
                 </div>
-              <!-- </mat-tab>
-            </mat-tab-group> -->
+              </div>
+            </div>
           </div>
         </div>
       </div>
