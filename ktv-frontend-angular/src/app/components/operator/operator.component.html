@@ -85,7 +85,7 @@
     <!-- SONG AND PLAYLIST -->
     <div class="d-flex flex-column w-60">
       <div class="h-100 m-1 bg-light">
-        <mat-tab-group>
+        <mat-tab-group [backgroundColor]="'primary'" [color]="'warn'" (selectedTabChange)="$event.index === 1 ? formSearch(false) : ''">
           <mat-tab label="Song">
             <div class="h-100 d-flex flex-column">
               <!-- SONG SEARCHING -->
@@ -211,23 +211,23 @@
                     <table mat-table [dataSource]="source.playlistCategory" multiTemplateDataRows class="w-100">
                       <ng-container matColumnDef="title">
                         <th mat-header-cell *matHeaderCellDef> Title </th>
-                        <td mat-cell *matCellDef="let element;" (click)="detailPlaylist = detailPlaylist === element ? null : element"> {{element.name}} </td>
+                        <td mat-cell *matCellDef="let element;" (click)="data.detailPlaylist = data.detailPlaylist === element ? null : element"> {{element.name}} </td>
                       </ng-container>
 
                       <ng-container matColumnDef="category">
                         <th mat-header-cell *matHeaderCellDef> Category </th>
-                        <td mat-cell *matCellDef="let element;" (click)="detailPlaylist = detailPlaylist === element ? null : element"> {{element.category.name}} </td>
+                        <td mat-cell *matCellDef="let element;" (click)="data.detailPlaylist = data.detailPlaylist === element ? null : element"> {{element.category.name}} </td>
                       </ng-container>
 
                       <ng-container matColumnDef="song">
                         <th mat-header-cell *matHeaderCellDef> Song </th>
-                        <td mat-cell *matCellDef="let element;" (click)="detailPlaylist = detailPlaylist === element ? null : element"> {{element.songs_count}} </td>
+                        <td mat-cell *matCellDef="let element;" (click)="data.detailPlaylist = data.detailPlaylist === element ? null : element"> {{element.songs_count}} </td>
                       </ng-container>
 
                       <ng-container matColumnDef="action">
                         <th mat-header-cell *matHeaderCellDef> Add </th>
-                        <td mat-cell *matCellDef="let element;" (click)="roomPlaylistAddAllSong(element.songs)">
-                          <button mat-flat-button [disabled]="data.room.session ? false : true" color="primary">
+                        <td mat-cell *matCellDef="let element;">
+                          <button mat-flat-button [disabled]="data.room.session ? false : true" color="primary" (click)="roomPlaylistAddAllSong(element.songs)">
                             <mat-icon>add</mat-icon>
                           </button>
                         </td>
@@ -235,7 +235,7 @@
 
                       <ng-container matColumnDef="songs">
                           <td mat-cell *matCellDef="let element;" [attr.colspan]="column.songs.length">
-                            <div class="element-detail" [@elementDetailPlaylist]="element == detailPlaylist ? 'expanded' : 'collapsed'">
+                            <div class="element-detail" [@elementDetailPlaylist]="element === data.detailPlaylist ? 'expanded' : 'collapsed'">
                               <div class="w-100">
                                 <table mat-table [dataSource]="element.songs" class="w-100">
                                   <ng-container matColumnDef="title">
@@ -266,7 +266,7 @@
                         </ng-container>
 
                       <tr mat-header-row *matHeaderRowDef="column.playlistCategory; sticky: true"></tr>
-                      <tr mat-row *matRowDef="let element; columns: column.playlistCategory;" class="element-row" [class.expanded-row]="detailPlaylist === element"></tr>
+                      <tr mat-row *matRowDef="let element; columns: column.playlistCategory;" class="element-row" [class.expanded-row]="data.detailPlaylist === element"></tr>
                       <tr mat-row *matRowDef="let element; columns: ['songs']" class="detail-row"></tr>
                     </table>
                   </div>

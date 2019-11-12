@@ -249,7 +249,6 @@ export class OperatorComponent implements OnInit {
   }
 
   roomPlaylistAddAllSong(data) {
-    console.log(data);
     if (this.data.room.session) {
       data.forEach((v) => {
         this.roomPlaylistAddSong(v);
@@ -390,9 +389,7 @@ export class OperatorComponent implements OnInit {
         );
       }
     } else {
-      if (this.form.search.playlist || (this.form.search.category >= 0)) {
-        this.operator.playlist(this.form.search).subscribe(res => this.playlist(res), error => console.log(error));
-      }
+      this.operator.playlist(this.form.search).subscribe(res => this.playlist(res), error => console.log(error));
     }
   }
 
