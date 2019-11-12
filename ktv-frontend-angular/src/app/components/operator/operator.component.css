@@ -21,7 +21,7 @@ video::-webkit-media-controls-fullscreen-button { display: none; }
     color: white;
 }
 
-.badge-complete {
+.badge-occupied {
     background-color: #48b0f7;
     color: white;
 }
@@ -44,7 +44,11 @@ video::-webkit-media-controls-fullscreen-button { display: none; }
 .mat-tab-group {
     height: 100%;
 }
-  
+
+.mat-header-row {
+    height: 35px;
+}
+
 .mat-row {
     height: auto;
 }
@@ -54,7 +58,7 @@ video::-webkit-media-controls-fullscreen-button { display: none; }
 }
 
 .mat-cell {
-    padding: 5px 5px 5px 5px;
+    padding: 0px 5px 0px 5px;
     font-size: 12px;
 }
 
@@ -112,7 +116,6 @@ video::-webkit-media-controls-fullscreen-button { display: none; }
 .fab-container {
     position: fixed;
     bottom: 15px;
-    /* right: 15px; */
     left: 16%;
     z-index: 101;
     display: flex;
@@ -134,4 +137,25 @@ video::-webkit-media-controls-fullscreen-button { display: none; }
 .fab-toggler {
     float: right;
     z-index: 101;
+}
+  
+tr.detail-row {
+    height: 0px;
+}
+
+tr.element-row:not(.expanded-row):hover {
+    background: #777;
+}
+
+tr.element-row:not(.expanded-row):active {
+    background: #efefef;
+}
+
+.element-row td {
+    border-bottom-width: 0;
+}
+
+.element-detail {
+    overflow: hidden;
+    display: flex;
 }

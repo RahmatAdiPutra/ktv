@@ -8,27 +8,27 @@
           <table mat-table [dataSource]="source.rooms" class="w-100 room">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef> Room </th>
-              <td mat-cell *matCellDef="let element; let row;" (click)="roomSelect(row)"> {{element.name}} </td>
+              <td mat-cell *matCellDef="let row;" (click)="roomSelect(row)"> {{row.name}} </td>
             </ng-container>
 
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef> Status </th>
-              <td mat-cell *matCellDef="let element; let row;" (click)="roomSelect(row)"> <span class="badge badge-pill badge-{{element.status.color}}">{{element.status.name}}</span> </td>
+              <td mat-cell *matCellDef="let row;" (click)="roomSelect(row)"> <span class="badge badge-pill badge-{{row.status.color}}">{{row.status.name}}</span> </td>
             </ng-container>
 
             <ng-container matColumnDef="guest_name">
               <th mat-header-cell *matHeaderCellDef> Guest </th>
-              <td mat-cell *matCellDef="let element; let row;" (click)="roomSelect(row)"> {{element.guest_name}} </td>
+              <td mat-cell *matCellDef="let row;" (click)="roomSelect(row)"> {{row.guest_name}} </td>
             </ng-container>
 
             <ng-container matColumnDef="ip_address">
               <th mat-header-cell *matHeaderCellDef> </th>
-              <td mat-cell *matCellDef="let element">
-                <button mat-icon-button color="primary"  [matMenuTriggerFor]="appMenu">
+              <td mat-cell *matCellDef="let row;">
+                <button mat-icon-button color="primary" [matMenuTriggerFor]="appMenu">
                   <mat-icon>more_vert</mat-icon>
                 </button> 
                 <mat-menu #appMenu="matMenu">
-                  <button mat-menu-item>{{element.ip_address}}</button>
+                  <button mat-menu-item>{{row.ip_address}}</button>
                 </mat-menu>
               </td>
             </ng-container>
@@ -48,18 +48,18 @@
           <table mat-table [dataSource]="source.calls" class="w-100">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef> Room </th>
-              <td mat-cell *matCellDef="let element"> {{element.room.name}} </td>
+              <td mat-cell *matCellDef="let row;"> {{row.room.name}} </td>
             </ng-container>
 
             <ng-container matColumnDef="guest">
               <th mat-header-cell *matHeaderCellDef> Guest </th>
-              <td mat-cell *matCellDef="let element"> {{element.room.guest_name}} </td>
+              <td mat-cell *matCellDef="let row;"> {{row.room.guest_name}} </td>
             </ng-container>
 
             <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef width="50"> </th>
-              <td mat-cell *matCellDef="let element; let row">
-                <button mat-icon-button color="primary" (click)="callSelect(row)">
+              <td mat-cell *matCellDef="let row;">
+                <button mat-icon-button color="primary" (click)="callRespond(row)">
                   <mat-icon>phone_callback</mat-icon>
                 </button>
               </td>
@@ -69,7 +69,7 @@
             <tr mat-row *matRowDef="let row; columns: column.calls;"></tr>
           </table>
           <div class="fab-container">
-            <button mat-mini-fab class="fab-toggler" color="primary" (click)="onToggleFab()">
+            <button mat-mini-fab class="fab-toggler" color="primary" (click)="callToggleFab()">
               <mat-icon>view_headline</mat-icon>
             </button>
           </div>
@@ -82,95 +82,203 @@
 
   <!-- SECTION 2 -->
   <div class="d-flex flex-row w-80">
-    <!-- SONG -->
+    <!-- SONG AND PLAYLIST -->
     <div class="d-flex flex-column w-60">
-      <!-- SONG SEARCHING -->
-      <div class="m-1">
-        <div class="d-flex flex-column bg-light">
-          <div class="d-flex flex-row">
-            <div class="align-self-center p-1 w-50">
-              <mat-form-field class="w-100">
-                <input matInput placeholder="Song" [(ngModel)]="form.search.song" (input)="formSearch()">
-              </mat-form-field>
+      <div class="h-100 m-1 bg-light">
+        <mat-tab-group>
+          <mat-tab label="Song">
+            <div class="h-100 d-flex flex-column">
+              <!-- SONG SEARCHING -->
+              <div class="p-1 bg-white">
+                <div class="d-flex flex-column">
+                  <div class="d-flex flex-row">
+                    <div class="align-self-center p-1 w-30">
+                      <mat-form-field class="w-100">
+                        <input matInput placeholder="Song" [(ngModel)]="form.search.song" (input)="formSearch(true)" autocomplete="off">
+                      </mat-form-field>
+                    </div>
+                    <div class="align-self-center p-1 w-40">
+                      <mat-form-field class="w-100">
+                        <input matInput placeholder="Artist" [(ngModel)]="form.search.artist" (input)="formSearch(true)" autocomplete="off">
+                      </mat-form-field>
+                    </div>
+                    <div class="align-self-center p-1 w-30">
+                      <mat-form-field class="w-100">
+                        <mat-select placeholder="Language" [(ngModel)]="form.search.language" (selectionChange)="formSearch(true)">
+                          <mat-option *ngFor="let option of select.languages" [value]="option.id">{{option.name}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-row">
+                    <div class="align-self-center p-1">
+                      <button mat-raised-button color="primary" (click)="formSearch(true)"><mat-icon>search</mat-icon> Search</button>
+                    </div>
+                    <div class="align-self-center p-1">
+                      <button mat-raised-button color="primary" (click)="formSearchClear(true)"><mat-icon>clear</mat-icon> Clear</button>
+                    </div>
+                    <div class="align-self-center p-1">
+                      <mat-checkbox [(ngModel)]="form.search.new" (input)="formSearch(true)">New Release</mat-checkbox>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- END SONG SEARCHING -->
+
+              <!-- SONG BANK -->
+              <div class="m-1 vh-100">
+                <div class="h-100 d-flex flex-column">
+                  <div class="bg-light overflow-auto flex-grow-1 vh-100">
+                    <table mat-table [dataSource]="source.songs" class="w-100 song">
+                      <ng-container matColumnDef="title">
+                        <th mat-header-cell *matHeaderCellDef> Title </th>
+                        <td mat-cell *matCellDef="let row;" (click)="songSelect(row)"> {{row.title}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="artist">
+                        <th mat-header-cell *matHeaderCellDef> Artist </th>
+                        <td mat-cell *matCellDef="let row;" (click)="songSelect(row)"> {{row.artist_label}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="genre">
+                        <th mat-header-cell *matHeaderCellDef> Genre </th>
+                        <td mat-cell *matCellDef="let row;" (click)="songSelect(row)"> {{row.genre.name}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="language">
+                        <th mat-header-cell *matHeaderCellDef> Language </th>
+                        <td mat-cell *matCellDef="let row;" (click)="songSelect(row)"> {{row.language.name}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef> Add </th>
+                        <td mat-cell *matCellDef="let row;">
+                          <button mat-flat-button [disabled]="data.room.session ? false : true" color="primary" (click)="roomPlaylistAddSong(row)">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        </td>
+                      </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="column.songs; sticky: true"></tr>
+                      <tr mat-row *matRowDef="let row; columns: column.songs;"></tr>
+                    </table>
+                  </div>
+                  <div class="bg-light">
+                    <mat-paginator [pageSizeOptions]="page.song.pageSizeOptions" [pageSize]="page.song.pageSize"
+                      [length]="page.song.length" showFirstLastButtons (page)="songPageEvent($event)"></mat-paginator>
+                  </div>
+                </div>
+              </div>
+              <!-- END SONG BANK -->
             </div>
-            <div class="align-self-center p-1 w-50">
-              <mat-form-field class="w-100">
-                <input matInput placeholder="Artist" [(ngModel)]="form.search.artist" (input)="formSearch()">
-              </mat-form-field>
+          </mat-tab>
+          <mat-tab label="Playlist">
+            <div class="h-100 d-flex flex-column">
+              <!-- PLAYLIST SEARCHING -->
+              <div class="p-1 bg-white">
+                <div class="d-flex flex-column">
+                  <div class="d-flex flex-row">
+                    <div class="align-self-center p-1 w-50">
+                      <mat-form-field class="w-100">
+                        <input matInput placeholder="Playlist" [(ngModel)]="form.search.playlist" (input)="form.search.playlist.length>2 && formSearch(false)" autocomplete="off">
+                      </mat-form-field>
+                    </div>
+                    <div class="align-self-center p-1 w-50">
+                      <mat-form-field class="w-100">
+                        <mat-select placeholder="Category" [(ngModel)]="form.search.category" (selectionChange)="formSearch(false)">
+                          <mat-option *ngFor="let option of select.categories" [value]="option.id">{{option.name}}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-row">
+                    <div class="align-self-center p-1">
+                      <button mat-raised-button color="primary" (click)="formSearch(false)"><mat-icon>search</mat-icon> Search</button>
+                    </div>
+                    <div class="align-self-center p-1">
+                      <button mat-raised-button color="primary" (click)="formSearchClear(false)"><mat-icon>clear</mat-icon> Clear</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- END PLAYLIST SEARCHING -->
+
+              <!-- PLAYLIST BANK -->
+              <div class="m-1 vh-100">
+                <div class="h-100 d-flex flex-column">
+                  <div class="bg-light overflow-auto">
+                    <table mat-table [dataSource]="source.playlistCategory" multiTemplateDataRows class="w-100">
+                      <ng-container matColumnDef="title">
+                        <th mat-header-cell *matHeaderCellDef> Title </th>
+                        <td mat-cell *matCellDef="let element;" (click)="detailPlaylist = detailPlaylist === element ? null : element"> {{element.name}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="category">
+                        <th mat-header-cell *matHeaderCellDef> Category </th>
+                        <td mat-cell *matCellDef="let element;" (click)="detailPlaylist = detailPlaylist === element ? null : element"> {{element.category.name}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="song">
+                        <th mat-header-cell *matHeaderCellDef> Song </th>
+                        <td mat-cell *matCellDef="let element;" (click)="detailPlaylist = detailPlaylist === element ? null : element"> {{element.songs_count}} </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef> Add </th>
+                        <td mat-cell *matCellDef="let element;" (click)="roomPlaylistAddAllSong(element.songs)">
+                          <button mat-flat-button [disabled]="data.room.session ? false : true" color="primary">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="songs">
+                          <td mat-cell *matCellDef="let element;" [attr.colspan]="column.songs.length">
+                            <div class="element-detail" [@elementDetailPlaylist]="element == detailPlaylist ? 'expanded' : 'collapsed'">
+                              <div class="w-100">
+                                <table mat-table [dataSource]="element.songs" class="w-100">
+                                  <ng-container matColumnDef="title">
+                                    <th mat-header-cell *matHeaderCellDef> Title </th>
+                                    <td mat-cell *matCellDef="let elementDetail;" (click)="songSelect(elementDetail)"> {{elementDetail.title}} </td>
+                                  </ng-container>
+            
+                                  <ng-container matColumnDef="artist">
+                                    <th mat-header-cell *matHeaderCellDef> Artist </th>
+                                    <td mat-cell *matCellDef="let elementDetail;" (click)="songSelect(elementDetail)"> {{elementDetail.artist_label}} </td>
+                                  </ng-container>
+            
+                                  <ng-container matColumnDef="action">
+                                    <th mat-header-cell *matHeaderCellDef> Add </th>
+                                    <td mat-cell *matCellDef="let elementDetail;">
+                                      <button mat-flat-button [disabled]="data.room.session ? false : true" color="primary" (click)="roomPlaylistAddSong(elementDetail)">
+                                        <mat-icon>add</mat-icon>
+                                      </button>
+                                    </td>
+                                  </ng-container>
+            
+                                  <tr mat-header-row *matHeaderRowDef="column.playlistDetail; sticky: true"></tr>
+                                  <tr mat-row *matRowDef="let elementDetail; columns: column.playlistDetail;"></tr>
+                                </table>
+                              </div>
+                            </div>
+                          </td>
+                        </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="column.playlistCategory; sticky: true"></tr>
+                      <tr mat-row *matRowDef="let element; columns: column.playlistCategory;" class="element-row" [class.expanded-row]="detailPlaylist === element"></tr>
+                      <tr mat-row *matRowDef="let element; columns: ['songs']" class="detail-row"></tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+                <!-- END PLAYLIST BANK -->
             </div>
-          </div>
-          <div class="d-flex flex-row">
-            <div class="align-self-center p-1 w-50">
-              <mat-form-field class="w-100">
-                <mat-select placeholder="Language" [(ngModel)]="form.search.language" (selectionChange)="formSearch()">
-                  <mat-option *ngFor="let option of select.languages" [value]="option.id">{{option.name}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="align-self-center p-1 w-50">
-              <mat-checkbox [(ngModel)]="form.search.new" (input)="formSearch()">New Release</mat-checkbox>
-            </div>
-          </div>
-          <div class="d-flex flex-row">
-            <div class="align-self-center p-1">
-              <button mat-raised-button color="primary" (click)="formSearch()">Search</button>
-            </div>
-            <div class="align-self-center p-1">
-              <button mat-raised-button color="primary" (click)="formSearchClear()">Clear</button>
-            </div>
-          </div>
-        </div>
+          </mat-tab>
+        </mat-tab-group>
       </div>
-      <!-- END SONG SEARCHING -->
-
-      <!-- SONG BANK -->
-      <div class="m-1 flex-grow-1 overflow-auto">
-        <div class="h-100 d-flex flex-column">
-          <div class="bg-light overflow-auto flex-grow-1">
-            <table mat-table [dataSource]="source.songs" class="w-100 song">
-              <ng-container matColumnDef="title">
-                <th mat-header-cell *matHeaderCellDef> Title </th>
-                <td mat-cell *matCellDef="let element; let row" (click)="songSelect(row)"> {{element.title}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="artist">
-                <th mat-header-cell *matHeaderCellDef> Artist </th>
-                <td mat-cell *matCellDef="let element; let row" (click)="songSelect(row)"> {{element.artist_label}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="genre">
-                <th mat-header-cell *matHeaderCellDef> Genre </th>
-                <td mat-cell *matCellDef="let element; let row" (click)="songSelect(row)"> {{element.genre.name}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="language">
-                <th mat-header-cell *matHeaderCellDef> Language </th>
-                <td mat-cell *matCellDef="let element; let row" (click)="songSelect(row)"> {{element.language.name}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="action">
-                <th mat-header-cell *matHeaderCellDef> Add </th>
-                <td mat-cell *matCellDef="let element; let row">
-                  <button mat-flat-button color="primary" (click)="addSongToPlaylist(row)">
-                    <mat-icon>add</mat-icon>
-                  </button>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="column.songs; sticky: true"></tr>
-              <tr mat-row *matRowDef="let row; columns: column.songs;"></tr>
-            </table>
-          </div>
-          <div class="bg-light">
-            <mat-paginator [pageSizeOptions]="page.song.pageSizeOptions" [pageSize]="page.song.pageSize"
-              [length]="page.song.length" showFirstLastButtons (page)="songPageEvent($event)"></mat-paginator>
-          </div>
-        </div>
-      </div>
-      <!-- END SONG BANK -->
     </div>
-    <!-- END SONG -->
+    <!-- END SONG AND PLAYLIST -->
 
     <!-- PRIVIEW AND PLAYLIST -->
     <div class="d-flex flex-column w-40">
@@ -198,27 +306,27 @@
       <!-- ROOM PLAYLIST -->
       <div class="h-75">
         <div class="h-100 d-flex flex-column">
-          <div class="h-100 m-1 overflow-auto bg-light">
+          <div class="h-100 m-1 bg-light">
             <!-- <mat-tab-group>
               <mat-tab label="Playlist {{ data.room.name }}"> -->
-                <div class="d-flex flex-column h-100">
+                <div class="h-100 d-flex flex-column">
                   <div class="overflow-auto flex-grow-1 vh-100">
                     <table mat-table [dataSource]="source.playlists" class="w-100" #table cdkDropList
-                      [cdkDropListData]="source.playlists" (cdkDropListDropped)="playlistDrop($event)">
+                      [cdkDropListData]="source.playlists" (cdkDropListDropped)="roomPlaylistDrop($event)">
                       <ng-container matColumnDef="title">
                         <th mat-header-cell *matHeaderCellDef> Title </th>
-                        <td mat-cell *matCellDef="let element; let row" (click)="songPlaylistSelect(row)"> {{element.song.title}} </td>
+                        <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)"> {{row.song.title}} </td>
                       </ng-container>
 
                       <ng-container matColumnDef="artist">
                         <th mat-header-cell *matHeaderCellDef> Artist </th>
-                        <td mat-cell *matCellDef="let element; let row" (click)="songPlaylistSelect(row)"> {{element.song.artist_label}} </td>
+                        <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)"> {{row.song.artist_label}} </td>
                       </ng-container>
 
                       <ng-container matColumnDef="is_play">
                         <th mat-header-cell *matHeaderCellDef width="50"></th>
-                        <td mat-cell *matCellDef="let element; let row" (click)="songPlaylistSelect(row)">
-                          <div *ngIf="element.now_playing">
+                        <td mat-cell *matCellDef="let row;" (click)="roomPlaylistSelectSong(row)">
+                          <div *ngIf="row.now_playing">
                             <mat-icon *ngIf="data.player.playing === 'playing'; else pause">play_arrow</mat-icon>
                             <ng-template #pause>
                                 <mat-icon>pause</mat-icon>
@@ -229,12 +337,12 @@
 
                       <ng-container matColumnDef="action">
                         <th mat-header-cell *matHeaderCellDef width="50"> 
-                          <button mat-icon-button (click)="deleteAllSongFromPlaylist()">
+                          <button mat-icon-button [disabled]="data.room.session ? false : true" (click)="roomPlaylistDeleteAllSong()">
                             <mat-icon>delete</mat-icon>
                           </button>
                         </th>
-                        <td mat-cell *matCellDef="let element; let i = index;">
-                          <button mat-icon-button color="warn" (click)="deleteSongFromPlaylist(element)">
+                        <td mat-cell *matCellDef="let row;">
+                          <button mat-icon-button color="warn" (click)="roomPlaylistDeleteSong(row)">
                             <mat-icon>delete_forever</mat-icon>
                           </button>
                         </td>
@@ -247,16 +355,16 @@
                   </div>
                   <div class="d-flex flex-row justify-content-between w-100 bg-white">
                     <div class="p-1">
-                      <button class="m-1" mat-raised-button color="primary" (click)="playToggle()">
+                      <button class="m-1" [disabled]="data.room.session ? false : true" mat-raised-button color="primary" (click)="roomPlaylistTogglePlay()">
                         <div *ngIf="data.player.playing === 'playing'; then thenPlay; else elsePlay">pause</div>
                         <ng-template #thenPlay>
-                            <mat-icon>pause</mat-icon>
+                            <mat-icon>pause</mat-icon> Pause
                         </ng-template>
                         <ng-template #elsePlay>
-                            <mat-icon>play_arrow</mat-icon>
+                            <mat-icon>play_arrow</mat-icon> Play
                         </ng-template>
                       </button>
-                      <button class="m-1" mat-raised-button color="primary" (click)="vocalToggle()">
+                      <button class="m-1" [disabled]="data.room.session ? false : true" mat-raised-button color="primary" (click)="roomPlaylistToggleVocal()">
                           <div *ngIf="data.player.vocal === true; then thenVocal; else elseVocal"></div>
                           <ng-template #thenVocal>
                               <mat-icon>mic_off</mat-icon>
