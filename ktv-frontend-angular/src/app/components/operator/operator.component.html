@@ -3,13 +3,22 @@
   <div class="d-flex flex-column w-20">
     <!-- STATUS ROOM -->
     <div class="h-75">
-      <app-operator-room [(data)]="data" [(source)]="source" [(column)]="column" [roomSelect]="roomSelect.bind(this)"></app-operator-room>
+      <app-operator-room
+        [data]="data"
+        [source]="source"
+        [column]="column"
+        [roomSelect]="roomSelect.bind(this)"></app-operator-room>
     </div>
     <!-- END STATUS ROOM -->
 
     <!-- NOTIFY CALLING -->
     <div class="h-25">
-      <app-operator-room-call [(data)]="data" [(source)]="source" [(column)]="column" [callRespond]="callRespond.bind(this)" [callToggleFab]="callToggleFab.bind(this)"></app-operator-room-call>
+      <app-operator-room-call
+        [data]="data"
+        [source]="source"
+        [column]="column"
+        [callRespond]="callRespond.bind(this)"
+        [callToggleFab]="callToggleFab.bind(this)"></app-operator-room-call>
     </div>
     <!-- END NOTIFY CALLING -->
   </div>
@@ -23,12 +32,12 @@
         <mat-tab-group [backgroundColor]="'primary'" [color]="'warn'" (selectedTabChange)="$event.index === 1 ? formSearch(false) : ''">
           <mat-tab label="Song">
             <app-operator-song
-              [(data)]="data"
-              [(select)]="select"
-              [(source)]="source"
-              [(column)]="column"
-              [(page)]="page"
-              [(form)]="form"
+              [data]="data"
+              [select]="select"
+              [source]="source"
+              [column]="column"
+              [page]="page"
+              [form]="form"
               [formSearch]="formSearch.bind(this)"
               [formSearchClear]="formSearchClear.bind(this)"
               [songSelect]="songSelect.bind(this)"
@@ -39,11 +48,11 @@
           </mat-tab>
           <mat-tab label="Playlist">
             <app-operator-playlist
-              [(data)]="data"
-              [(select)]="select"
-              [(source)]="source"
-              [(column)]="column"
-              [(form)]="form"
+              [data]="data"
+              [select]="select"
+              [source]="source"
+              [column]="column"
+              [form]="form"
               [formSearch]="formSearch.bind(this)"
               [formSearchClear]="formSearchClear.bind(this)"
               [songSelect]="songSelect.bind(this)"
@@ -59,16 +68,16 @@
     <div class="d-flex flex-column w-40">
       <!-- PRIVIEW -->
       <div class="h-25">
-        <app-operator-preview-video [(data)]="data"></app-operator-preview-video>
+        <app-operator-preview-video [data]="data"></app-operator-preview-video>
       </div>
       <!-- END PRIVIEW -->
 
       <!-- ROOM PLAYLIST -->
       <div class="h-75">
         <app-operator-room-playlist
-          [(data)]="data"
-          [(source)]="source"
-          [(column)]="column"
+          [data]="data"
+          [source]="source"
+          [column]="column"
           [roomPlaylistDrop]="roomPlaylistDrop.bind(this)"
           [roomPlaylistSelectSong]="roomPlaylistSelectSong.bind(this)"
           [roomPlaylistDeleteAllSong]="roomPlaylistDeleteAllSong.bind(this)"
