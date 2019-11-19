@@ -36,9 +36,10 @@ export class OperatorComponent implements OnInit {
 
   selected = false;
 
-  @ViewChild(MatPaginator) songPaginator: MatPaginator;
-  @ViewChild('table') table: MatTable < string[] > ;
-  @ViewChild('player') player;
+  // @ViewChild(MatPaginator) songPaginator: MatPaginator;
+  songPaginator: any = {};
+  // @ViewChild('table') table: MatTable < string[] > ;
+  table: any = {};
 
   constructor(
     public dialog: MatDialog,
@@ -88,6 +89,14 @@ export class OperatorComponent implements OnInit {
     this.operator.song().subscribe(res => this.song(res), error => console.log(error));
     this.operator.room().subscribe(res => this.room(res), error => console.log(error));
     this.operator.call().subscribe(res => this.call(res), error => console.log(error));
+  }
+
+  ngOnSongPaginator(event) {
+    this.songPaginator = event;
+  }
+
+  ngOnTable(event) {
+    this.table = event;
   }
 
   language(res) {

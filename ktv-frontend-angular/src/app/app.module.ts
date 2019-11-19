@@ -26,6 +26,12 @@ import { DialogAllowSoundCallComponent } from './components/dialog-allow-sound-c
 import { LoginComponent } from './components/login/login.component';
 import { OfflineComponent } from './components/offline/offline.component';
 import { PlaylistComponent } from './components/playlist/playlist.component';
+import { OperatorPlaylistComponent } from './components/operator/operator-playlist/operator-playlist.component';
+import { OperatorRoomComponent } from './components/operator/operator-room/operator-room.component';
+import { OperatorRoomCallComponent } from './components/operator/operator-room-call/operator-room-call.component';
+import { OperatorRoomPlaylistComponent } from './components/operator/operator-room-playlist/operator-room-playlist.component';
+import { OperatorSongComponent } from './components/operator/operator-song/operator-song.component';
+import { OperatorPreviewVideoComponent } from './components/operator/operator-preview-video/operator-preview-video.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +46,13 @@ import { PlaylistComponent } from './components/playlist/playlist.component';
     DialogAllowSoundCallComponent,
     LoginComponent,
     OfflineComponent,
-    PlaylistComponent
+    PlaylistComponent,
+    OperatorPlaylistComponent,
+    OperatorRoomComponent,
+    OperatorRoomCallComponent,
+    OperatorRoomPlaylistComponent,
+    OperatorSongComponent,
+    OperatorPreviewVideoComponent
   ],
   entryComponents: [
     DialogDeleteComponent,

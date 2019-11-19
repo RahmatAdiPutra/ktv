@@ -1,0 +1,10 @@
+<div class="h-100 d-flex flex-column">
+  <div class="h-100 m-1 overflow-auto bg-light">
+    <div class="h-100 d-flex flex-column">
+      <video class="h-100 w-100" [src]="data.song.url" controls autoplay disablePictureInPicture
+        controlsList="nodownload">
+        <source [src]="data.song.url" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</div>
