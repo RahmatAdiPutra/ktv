@@ -6,7 +6,7 @@
       <mat-card-content>
         <form (submit)="login()" action="#">
         <mat-form-field class="w-100">
-          <input matInput placeholder="Username" [(ngModel)]="form.username"  [ngModelOptions]="{standalone: true}">
+          <input matInput placeholder="Username" [(ngModel)]="form.username"  [ngModelOptions]="{standalone: true}" autocomplete="off">
         </mat-form-field>
         <mat-form-field class="w-100">
           <input matInput type="password" placeholder="Password" [(ngModel)]="form.password"  [ngModelOptions]="{standalone: true}">
