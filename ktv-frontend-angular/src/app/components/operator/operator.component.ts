@@ -176,6 +176,7 @@ export class OperatorComponent implements OnInit {
   songRefresh(res) {
     this.data.songs = res.payloads.data;
     this.source.songs = new MatTableDataSource(this.data.songs);
+    this.source.songs.sort = this.songSort;
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
   }
