@@ -44,7 +44,9 @@
               [roomPlaylistAddSong]="roomPlaylistAddSong.bind(this)"
               [songPageEvent]="songPageEvent.bind(this)"
               [songPaginator]="songPaginator"
-              (ngOnSongPaginator)="ngOnSongPaginator($event)"></app-operator-song>
+              [songSort]="songSort"
+              (ngOnSongPaginator)="ngOnSongPaginator($event)"
+              (ngOnSongSort)="ngOnSongSort($event)"></app-operator-song>
           </mat-tab>
           <mat-tab label="Playlist">
             <app-operator-playlist

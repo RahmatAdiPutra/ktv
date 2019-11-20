@@ -38,6 +38,7 @@ export class OperatorComponent implements OnInit {
 
   // @ViewChild(MatPaginator) songPaginator: MatPaginator;
   songPaginator: any = {};
+  songSort: any = {};
   // @ViewChild('table') table: MatTable < string[] > ;
   table: any = {};
 
@@ -95,6 +96,10 @@ export class OperatorComponent implements OnInit {
     this.songPaginator = event;
   }
 
+  ngOnSongSort(event) {
+    this.songSort = event;
+  }
+
   ngOnTable(event) {
     this.table = event;
   }
@@ -126,6 +131,7 @@ export class OperatorComponent implements OnInit {
     this.data.songs = res.payloads.data;
     this.source.songs = new MatTableDataSource(this.data.songs);
     this.source.songs.paginator = this.songPaginator;
+    this.source.songs.sort = this.songSort;
     this.page.song.pageSize = res.payloads.per_page;
     this.page.song.length = res.payloads.total;
     this.page.song.current_page = res.payloads.current_page;

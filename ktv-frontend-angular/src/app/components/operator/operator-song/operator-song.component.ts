@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
 import { MatPaginator } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-operator-song',
@@ -24,15 +25,21 @@ export class OperatorSongComponent implements OnInit {
   @Input() songPageEvent: Function;
 
   @Input() songPaginator: any = {};
+  @Input() songSort: any = {};
   @ViewChild(MatPaginator) matPaginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
   // tslint:disable-next-line: no-output-on-prefix
   @Output() ngOnSongPaginator: EventEmitter<any> = new EventEmitter<any>();
+  // tslint:disable-next-line: no-output-on-prefix
+  @Output() ngOnSongSort: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() { }
 
   ngOnInit() {
     this.songPaginator = this.matPaginator;
+    this.songSort = this.sort;
     this.ngOnSongPaginator.emit(this.songPaginator);
+    this.ngOnSongSort.emit(this.songSort);
   }
 
 }
